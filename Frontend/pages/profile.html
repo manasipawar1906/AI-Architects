@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LearnPath AI - Profile</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/profile.css">
+
+</head>
+
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+    <div class="logo">
+        LearnPath <span>AI</span>
+    </div>
+
+    <nav>
+
+        <a href="profile.html" class="active">
+            Profile
+        </a>
+
+        <a href="roadmap.html">
+            Roadmap
+        </a>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="assistant.html">
+            AI Assistant
+        </a>
+
+    </nav>
+
+</header>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="profile-page">
+
+    <div class="step-badge">
+        STEP 1
+    </div>
+
+
+    <h1>
+        Tell us about your learning goals
+    </h1>
+
+
+    <p class="page-description">
+        Your profile drives the recommendation engine.
+    </p>
+
+
+    <!-- ================= PROFILE FORM ================= -->
+
+    <section class="profile-card">
+
+        <form id="profileForm">
+
+
+            <!-- NAME -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        value="Manasi Madhukar Pawar"
+                        placeholder="Enter your name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- CAREER -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        Career / Learning Goal
+                    </label>
+
+                    <select id="career">
+
+                        <option>NLP Engineer</option>
+
+                        <option>
+                            Machine Learning Engineer
+                        </option>
+
+                        <option>
+                            Data Scientist
+                        </option>
+
+                        <option>
+                            AI Engineer
+                        </option>
+
+                        <option>
+                            Data Analyst
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- EXPERIENCE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Experience Level
+                    </label>
+
+                    <select id="experience">
+
+                        <option>Beginner</option>
+
+                        <option>
+                            Intermediate
+                        </option>
+
+                        <option>
+                            Advanced
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- CURRENT SKILLS -->
+
+            <div class="form-group">
+
+                <label>
+                    Current Skills
+                    <span>Comma separated</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="skills"
+                    value="Python, C, C++, NLP"
+                    placeholder="Python, C++, NLP"
+                >
+
+            </div>
+
+
+            <!-- INTERESTS -->
+
+            <div class="form-group">
+
+                <label>
+                    Interests
+                    <span>Comma separated</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="interests"
+                    value="Machine Learning, Data Science, AI"
+                    placeholder="Machine Learning, AI"
+                >
+
+            </div>
+
+
+            <!-- COMPLETED -->
+
+            <div class="form-group">
+
+                <label>
+                    Completed Courses / Skills
+                    <span>Comma separated</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="completed"
+                    value="Python, C, C++"
+                    placeholder="Python, C"
+                >
+
+            </div>
+
+
+            <!-- LAST ROW -->
+
+            <div class="form-row three-columns">
+
+
+                <!-- LEARNING STYLE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Learning Style
+                    </label>
+
+                    <select id="learningStyle">
+
+                        <option>
+                            Mixed
+                        </option>
+
+                        <option>
+                            Visual
+                        </option>
+
+                        <option>
+                            Reading
+                        </option>
+
+                        <option>
+                            Hands-on
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- HOURS -->
+
+                <div class="form-group">
+
+                    <label>
+                        Hours / Week
+                    </label>
+
+                    <input
+                        type="number"
+                        id="hours"
+                        value="4"
+                        min="1"
+                    >
+
+                </div>
+
+
+                <!-- MONTHS -->
+
+                <div class="form-group">
+
+                    <label>
+                        Target Months
+                    </label>
+
+                    <input
+                        type="number"
+                        id="months"
+                        value="7"
+                        min="1"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <button
+                type="submit"
+                class="generate-btn"
+            >
+
+                Generate Personalized Roadmap →
+
+            </button>
+
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<script src="../js/profile.js"></script>
+
+</body>
+
+</html>
