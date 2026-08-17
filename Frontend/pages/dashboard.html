@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        LearnPath AI - Dashboard
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/dashboard.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="logo">
+        LearnPath <span>AI</span>
+    </div>
+
+    <nav>
+
+        <a href="profile.html">
+            Profile
+        </a>
+
+        <a href="roadmap.html">
+            Roadmap
+        </a>
+
+        <a
+            href="dashboard.html"
+            class="active"
+        >
+            Dashboard
+        </a>
+
+        <a href="assistant.html">
+            AI Assistant
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="step-badge">
+        YOUR PROGRESS
+    </div>
+
+
+    <h1>
+        Welcome, Manasi 👋
+    </h1>
+
+
+    <p class="dashboard-subtitle">
+        Track your skills, milestones and next actions.
+    </p>
+
+
+    <!-- STATISTICS -->
+
+    <section class="stats-grid">
+
+        <div class="stat-card">
+
+            <span>
+                Overall Progress
+            </span>
+
+            <strong id="progress">
+                0%
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                Completed Courses
+            </span>
+
+            <strong id="completed">
+                0
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                Available Courses
+            </span>
+
+            <strong>
+                25
+            </strong>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                Study Time
+            </span>
+
+            <strong>
+                4h/wk
+            </strong>
+
+        </div>
+
+    </section>
+
+
+    <!-- CHARTS -->
+
+    <section class="charts">
+
+        <div class="chart-card">
+
+            <h2>
+                Skill Development
+            </h2>
+
+            <div class="bar-chart">
+
+                <div>
+                    <span style="height: 95%"></span>
+                    <label>Python</label>
+                </div>
+
+                <div>
+                    <span style="height: 25%"></span>
+                    <label>ML</label>
+                </div>
+
+                <div>
+                    <span style="height: 25%"></span>
+                    <label>DL</label>
+                </div>
+
+                <div>
+                    <span style="height: 95%"></span>
+                    <label>NLP</label>
+                </div>
+
+                <div>
+                    <span style="height: 25%"></span>
+                    <label>Transformers</label>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <h2>
+                Learning Progress
+            </h2>
+
+            <div class="donut">
+
+                <div class="donut-center">
+                    0%
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- COMPLETED -->
+
+    <section class="completed-section">
+
+        <h2>
+            Completed Learning
+        </h2>
+
+        <p id="completedMessage">
+            No completed courses yet.
+            Start your roadmap to see progress here.
+        </p>
+
+
+        <a
+            href="roadmap.html"
+            class="back-btn"
+        >
+            Back to Roadmap
+        </a>
+
+    </section>
+
+</main>
+
+
+<script src="../js/dashboard.js"></script>
+
+</body>
+
+</html>

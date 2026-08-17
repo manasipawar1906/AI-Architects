@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        LearnPath AI - Assistant
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/assistant.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="logo">
+        LearnPath <span>AI</span>
+    </div>
+
+    <nav>
+
+        <a href="profile.html">
+            Profile
+        </a>
+
+        <a href="roadmap.html">
+            Roadmap
+        </a>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a
+            href="assistant.html"
+            class="active"
+        >
+            AI Assistant
+        </a>
+
+    </nav>
+
+</header>
+
+
+<main class="assistant-page">
+
+
+    <div class="step-badge">
+        AI ASSISTANT
+    </div>
+
+
+    <h1>
+        Ask your learning coach
+    </h1>
+
+
+    <p class="assistant-subtitle">
+        Get explanations about your roadmap,
+        skill gaps, recommendations and study plan.
+    </p>
+
+
+    <section class="chat-box">
+
+
+        <div
+            class="messages"
+            id="messages"
+        >
+
+            <div class="message ai">
+
+                Hi Manasi Madhukar Pawar! 👋
+                I'm your learning assistant.
+
+                Ask me why something was recommended,
+                what your skill gaps are, or how to
+                adjust your roadmap.
+
+            </div>
+
+        </div>
+
+
+        <form id="chatForm">
+
+            <input
+                type="text"
+                id="chatInput"
+                placeholder="e.g. Why did you recommend Machine Learning first?"
+                autocomplete="off"
+            >
+
+            <button>
+                Send
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<script src="../js/assistant.js"></script>
+
+</body>
+
+</html>

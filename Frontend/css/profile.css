@@ -1,0 +1,227 @@
+.profile-page {
+
+    width: min(900px, 90%);
+
+    margin: 45px auto 80px;
+
+}
+
+
+.step-badge {
+
+    display: inline-block;
+
+    padding: 8px 14px;
+
+    border-radius: 20px;
+
+    border:
+        1px solid #5145c9;
+
+    background:
+        rgba(86, 72, 230, 0.08);
+
+    color: #9c8fff;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.5px;
+
+    margin-bottom: 14px;
+
+}
+
+
+.profile-page h1 {
+
+    font-size: 40px;
+
+    line-height: 1.2;
+
+    margin-bottom: 12px;
+
+}
+
+
+.page-description {
+
+    color: #9fa9c7;
+
+    margin-bottom: 32px;
+
+}
+
+
+/* ================= CARD ================= */
+
+.profile-card {
+
+    background:
+        rgba(21, 28, 50, 0.92);
+
+    border:
+        1px solid #2c3553;
+
+    border-radius: 21px;
+
+    padding: 27px;
+
+}
+
+
+/* ================= FORM ================= */
+
+.form-row {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 16px;
+
+    margin-bottom: 16px;
+
+}
+
+
+.three-columns {
+
+    grid-template-columns:
+        1fr 1fr 1fr;
+
+}
+
+
+.form-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-bottom: 16px;
+
+}
+
+
+.form-group label {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+.form-group label span {
+
+    font-size: 11px;
+
+    color: #737d9d;
+
+    font-weight: normal;
+
+}
+
+
+.form-group input,
+.form-group select {
+
+    height: 40px;
+
+    padding: 0 13px;
+
+    border-radius: 10px;
+
+    border:
+        1px solid #2c3554;
+
+    background: #0c1327;
+
+    color: #f4f6ff;
+
+    outline: none;
+
+}
+
+
+.form-group input:focus,
+.form-group select:focus {
+
+    border-color: #7665ff;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(118, 101, 255, 0.12);
+
+}
+
+
+/* ================= BUTTON ================= */
+
+.generate-btn {
+
+    width: 100%;
+
+    height: 42px;
+
+    margin-top: 8px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #7867ff,
+            #5c4ce8
+        );
+
+    color: white;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+
+}
+
+
+.generate-btn:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 10px 25px
+        rgba(102, 86, 245, 0.25);
+
+}
+
+
+/* ================= MOBILE ================= */
+
+@media(max-width: 700px) {
+
+    .profile-page h1 {
+
+        font-size: 30px;
+
+    }
+
+    .form-row,
+    .three-columns {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
