@@ -1,114 +1,612 @@
 from backend.schemas import LearnerProfile, RecommendationResponse
 
 
-def generate_recommendation(profile: LearnerProfile) -> RecommendationResponse:
-    """
-    Temporary backend recommendation engine.
+def generate_recommendation(
+    profile: LearnerProfile
+) -> RecommendationResponse:
 
-    This is intentionally simple so the frontend/backend can be connected
-    before Sanket finishes the ML module.
+    # -----------------------------------------
+    # Normalize user input
+    # -----------------------------------------
 
-    Later, replace this function with:
-        from ml.recommender import recommend_learning_path
+    skills = {
+        skill.strip().lower()
+        for skill in profile.skills
+        if skill.strip()
+    }
 
-    and return the ML result in the same response format.
-    """
+    interests = {
+        interest.strip().lower()
+        for interest in profile.interests
+        if interest.strip()
+    }
 
-    skills = {skill.lower() for skill in profile.skills}
-    interests = {item.lower() for item in profile.interests}
+    goal = profile.goal.strip().lower()
+    experience = profile.experience.strip().lower()
+
+
+    # -----------------------------------------
+    # Calculate skill gaps
+    # -----------------------------------------
 
     skill_gaps = []
 
+
+    # -----------------------------------------
+    # Python
+    # -----------------------------------------
+
     if "python" not in skills:
+
         skill_gaps.append("Python")
 
+
+    # -----------------------------------------
+    # Statistics
+    # -----------------------------------------
+
     if "statistics" not in skills:
+
         skill_gaps.append("Statistics")
 
-    if "machine learning" not in skills:
-        skill_gaps.append("Machine Learning")
 
-    if "deep learning" not in skills:
-        skill_gaps.append("Deep Learning")
+    # -----------------------------------------
+    # Machine Learning
+    # -----------------------------------------
 
-    if "nlp" in interests and "nlp" not in skills:
-        skill_gaps.append("Natural Language Processing")
+    if (
+        "machine learning" in goal
+        or "machine learning" in interests
+        or "ai" in goal
+        or "artificial intelligence" in goal
+    ):
 
-    if "generative ai" in interests:
-        skill_gaps.append("Generative AI")
+        if "machine learning" not in skills:
 
-    # Remove duplicates while preserving order.
-    skill_gaps = list(dict.fromkeys(skill_gaps))
+            skill_gaps.append(
+                "Machine Learning"
+            )
 
-    learning_path = [
-        {
-            "title": "Python for AI",
-            "level": "Beginner",
-            "duration": "2 weeks",
-            "description": "Strengthen Python programming skills required for AI development.",
-            "skills": ["Python", "NumPy", "Pandas"],
-            "project": "Build a data analysis project.",
+
+    # -----------------------------------------
+    # Deep Learning
+    # -----------------------------------------
+
+    if (
+        "deep learning" in interests
+        or "deep learning" in goal
+    ):
+
+        if "deep learning" not in skills:
+
+            skill_gaps.append(
+                "Deep Learning"
+            )
+
+
+    # -----------------------------------------
+    # NLP
+    # -----------------------------------------
+
+    if (
+        "nlp" in interests
+        or "natural language processing" in interests
+        or "nlp" in goal
+    ):
+
+        if "nlp" not in skills:
+
+            skill_gaps.append(
+                "Natural Language Processing"
+            )
+
+
+    # -----------------------------------------
+    # Generative AI
+    # -----------------------------------------
+
+    if (
+        "generative ai" in interests
+        or "generative ai" in goal
+        or "genai" in interests
+    ):
+
+        if "generative ai" not in skills:
+
+            skill_gaps.append(
+                "Generative AI"
+            )
+
+
+    # -----------------------------------------
+    # Data Science
+    # -----------------------------------------
+
+    if (
+        "data science" in goal
+        or "data science" in interests
+        or "data scientist" in goal
+    ):
+
+        if "pandas" not in skills:
+
+            skill_gaps.append("Pandas")
+
+
+        if "numpy" not in skills:
+
+            skill_gaps.append("NumPy")
+
+
+    # -----------------------------------------
+    # Web Development
+    # -----------------------------------------
+
+    if (
+        "web development" in goal
+        or "web developer" in goal
+        or "frontend" in interests
+        or "backend" in interests
+    ):
+
+        if "html" not in skills:
+
+            skill_gaps.append("HTML")
+
+
+        if "css" not in skills:
+
+            skill_gaps.append("CSS")
+
+
+        if "javascript" not in skills:
+
+            skill_gaps.append("JavaScript")
+
+
+    # -----------------------------------------
+    # Remove duplicate skill gaps
+    # -----------------------------------------
+
+    skill_gaps = list(
+        dict.fromkeys(
+            skill_gaps
+        )
+    )
+
+
+    # -----------------------------------------
+    # Calculate readiness percentage
+    # -----------------------------------------
+
+    current_skill_count = len(
+        skills
+    )
+
+
+    skill_gap_set = {
+        gap.strip().lower()
+        for gap in skill_gaps
+        if gap.strip()
+    }
+
+
+    skill_gap_count = len(
+        skill_gap_set
+    )
+
+
+    total_required_skills = (
+        current_skill_count
+        + skill_gap_count
+    )
+
+
+    if total_required_skills == 0:
+
+        readiness_percentage = 0
+
+    else:
+
+        readiness_percentage = round(
+            (
+                current_skill_count
+                / total_required_skills
+            ) * 100
+        )
+
+
+    # -----------------------------------------
+    # Keep percentage between 0 and 100
+    # -----------------------------------------
+
+    readiness_percentage = max(
+        0,
+        min(
+            100,
+            readiness_percentage
+        )
+    )
+
+
+    # -----------------------------------------
+    # Course database
+    # -----------------------------------------
+
+    courses = {
+
+        "python": {
+
+            "title":
+                "Python Programming Fundamentals",
+
+            "level":
+                "Beginner",
+
+            "duration":
+                "2 weeks",
+
+            "description":
+                "Learn Python programming, functions, collections and object-oriented programming.",
+
+            "skills":
+                [
+                    "Python",
+                    "Programming"
+                ],
+
+            "project":
+                "Build a CLI expense tracker."
         },
-        {
-            "title": "Statistics for Machine Learning",
-            "level": "Beginner",
-            "duration": "2 weeks",
-            "description": "Learn probability, statistics and mathematical concepts used in ML.",
-            "skills": ["Statistics", "Probability"],
-            "project": "Analyze a real-world dataset.",
+
+
+        "statistics": {
+
+            "title":
+                "Statistics for Data Science",
+
+            "level":
+                "Beginner",
+
+            "duration":
+                "2 weeks",
+
+            "description":
+                "Learn probability, statistics, distributions and hypothesis testing.",
+
+            "skills":
+                [
+                    "Statistics",
+                    "Probability"
+                ],
+
+            "project":
+                "Analyze a real-world dataset statistically."
         },
-        {
-            "title": "Machine Learning",
-            "level": "Intermediate",
-            "duration": "4 weeks",
-            "description": "Learn supervised and unsupervised machine learning algorithms.",
-            "skills": ["Regression", "Classification", "Clustering"],
-            "project": "Build a machine learning prediction system.",
+
+
+        "machine learning": {
+
+            "title":
+                "Machine Learning Fundamentals",
+
+            "level":
+                "Intermediate",
+
+            "duration":
+                "4 weeks",
+
+            "description":
+                "Learn supervised and unsupervised machine learning algorithms.",
+
+            "skills":
+                [
+                    "Regression",
+                    "Classification",
+                    "Clustering"
+                ],
+
+            "project":
+                "Build a machine learning prediction system."
         },
-        {
-            "title": "Deep Learning",
-            "level": "Advanced",
-            "duration": "4 weeks",
-            "description": "Learn neural networks and deep learning architectures.",
-            "skills": ["Neural Networks", "CNN", "RNN"],
-            "project": "Build an image classification model.",
+
+
+        "deep learning": {
+
+            "title":
+                "Deep Learning with Neural Networks",
+
+            "level":
+                "Advanced",
+
+            "duration":
+                "4 weeks",
+
+            "description":
+                "Learn neural networks, CNNs, RNNs and deep learning architectures.",
+
+            "skills":
+                [
+                    "Neural Networks",
+                    "CNN",
+                    "RNN"
+                ],
+
+            "project":
+                "Build an image classification model."
         },
-        {
-            "title": "Natural Language Processing",
-            "level": "Advanced",
-            "duration": "3 weeks",
-            "description": "Learn how machines understand and process human language.",
-            "skills": ["NLP", "Transformers", "Text Processing"],
-            "project": "Build a text classification system.",
+
+
+        "natural language processing": {
+
+            "title":
+                "Natural Language Processing",
+
+            "level":
+                "Advanced",
+
+            "duration":
+                "3 weeks",
+
+            "description":
+                "Learn text processing, NLP pipelines and language models.",
+
+            "skills":
+                [
+                    "NLP",
+                    "Text Processing",
+                    "Transformers"
+                ],
+
+            "project":
+                "Build a text classification system."
         },
-        {
-            "title": "Generative AI",
-            "level": "Advanced",
-            "duration": "3 weeks",
-            "description": "Learn LLMs, prompt engineering and generative AI applications.",
-            "skills": ["LLMs", "Prompt Engineering", "RAG"],
-            "project": "Build an AI chatbot.",
+
+
+        "generative ai": {
+
+            "title":
+                "Generative AI Fundamentals",
+
+            "level":
+                "Advanced",
+
+            "duration":
+                "3 weeks",
+
+            "description":
+                "Learn LLMs, prompt engineering, embeddings and RAG.",
+
+            "skills":
+                [
+                    "LLMs",
+                    "Prompt Engineering",
+                    "RAG"
+                ],
+
+            "project":
+                "Build an AI chatbot."
         },
-    ]
+
+
+        "pandas": {
+
+            "title":
+                "Pandas for Data Analysis",
+
+            "level":
+                "Beginner",
+
+            "duration":
+                "1 week",
+
+            "description":
+                "Learn data cleaning, transformation and analysis using Pandas.",
+
+            "skills":
+                [
+                    "Pandas",
+                    "Data Analysis"
+                ],
+
+            "project":
+                "Clean and analyze a real-world dataset."
+        },
+
+
+        "numpy": {
+
+            "title":
+                "NumPy for Data Science",
+
+            "level":
+                "Beginner",
+
+            "duration":
+                "1 week",
+
+            "description":
+                "Learn arrays, vectorization and numerical computing.",
+
+            "skills":
+                [
+                    "NumPy",
+                    "Numerical Computing"
+                ],
+
+            "project":
+                "Perform numerical analysis on a dataset."
+        },
+
+
+        "html": {
+
+            "title":
+                "HTML Fundamentals",
+
+            "level":
+                "Beginner",
+
+            "duration":
+                "1 week",
+
+            "description":
+                "Learn HTML structure, forms, tables and semantic elements.",
+
+            "skills":
+                [
+                    "HTML"
+                ],
+
+            "project":
+                "Build a personal portfolio webpage."
+        },
+
+
+        "css": {
+
+            "title":
+                "CSS and Web Design",
+
+            "level":
+                "Beginner",
+
+            "duration":
+                "1 week",
+
+            "description":
+                "Learn styling, layouts, responsive design and animations.",
+
+            "skills":
+                [
+                    "CSS",
+                    "Responsive Design"
+                ],
+
+            "project":
+                "Create a responsive website."
+        },
+
+
+        "javascript": {
+
+            "title":
+                "JavaScript Programming",
+
+            "level":
+                "Intermediate",
+
+            "duration":
+                "2 weeks",
+
+            "description":
+                "Learn JavaScript fundamentals, DOM manipulation and APIs.",
+
+            "skills":
+                [
+                    "JavaScript",
+                    "DOM",
+                    "APIs"
+                ],
+
+            "project":
+                "Build an interactive web application."
+        }
+    }
+
+
+    # -----------------------------------------
+    # Build personalized learning path
+    # -----------------------------------------
+
+    learning_path = []
+
+
+    for gap in skill_gaps:
+
+        key = gap.lower()
+
+
+        if key in courses:
+
+            learning_path.append(
+                courses[key]
+            )
+
+
+    # -----------------------------------------
+    # If no skill gaps are found
+    # -----------------------------------------
+
+    if not learning_path:
+
+        learning_path = [
+
+            {
+                "title":
+                    "Advanced Project Development",
+
+                "level":
+                    "Advanced",
+
+                "duration":
+                    "3 weeks",
+
+                "description":
+                    "Apply your existing skills to a real-world project.",
+
+                "skills":
+                    list(profile.skills),
+
+                "project":
+                    "Build a complete portfolio project."
+            }
+
+        ]
+
+
+    # -----------------------------------------
+    # Projects
+    # -----------------------------------------
 
     projects = [
-        "Data Analysis Project",
-        "Machine Learning Prediction System",
-        "Image Classification Project",
-        "AI Chatbot using NLP/Generative AI",
+
+        course["project"]
+
+        for course in learning_path
+
     ]
+
+
+    # -----------------------------------------
+    # Assessments
+    # -----------------------------------------
 
     assessments = [
-        "Python Assessment",
-        "Statistics and Machine Learning Quiz",
-        "Deep Learning Assessment",
-        "NLP and Generative AI Assessment",
+
+        f"{course['title']} Assessment"
+
+        for course in learning_path
+
     ]
 
+
+    # -----------------------------------------
+    # Return final recommendation
+    # -----------------------------------------
+
     return RecommendationResponse(
+
         skill_gaps=skill_gaps,
+
         learning_path=learning_path,
+
         projects=projects,
+
         assessments=assessments,
+
         goal=profile.goal,
+
+        readiness_percentage=
+            readiness_percentage
     )

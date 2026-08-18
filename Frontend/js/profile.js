@@ -1,78 +1,93 @@
-const profileForm =
-    document.getElementById("profileForm");
+const profileForm = document.getElementById("profileForm");
 
+profileForm.addEventListener("submit", async function (event) {
 
-profileForm.addEventListener(
-    "submit",
-    function (event) {
+    event.preventDefault();
 
-        event.preventDefault();
+    const profileData = {
 
+        name: document.getElementById("name").value,
 
-        const profileData = {
+        goal: document.getElementById("career").value,
 
-            name:
-                document.getElementById("name").value,
+        experience: document.getElementById("experience").value,
 
-            email:
-                document.getElementById("email").value,
+        study_time:
+            document.getElementById("hours").value +
+            " hours/day for " +
+            document.getElementById("months").value +
+            " months",
 
-            career:
-                document.getElementById("career").value,
+        interests:
+            document.getElementById("interests")
+                .value
+                .split(",")
+                .map(x => x.trim())
+                .filter(x => x !== ""),
 
-            experience:
-                document.getElementById("experience").value,
+        skills:
+            document.getElementById("skills")
+                .value
+                .split(",")
+                .map(x => x.trim())
+                .filter(x => x !== ""),
 
-            skills:
-                document.getElementById("skills")
-                    .value
-                    .split(",")
-                    .map(x => x.trim()),
+        previous_courses:
+            document.getElementById("completed").value,
 
-            interests:
-                document.getElementById("interests")
-                    .value
-                    .split(",")
-                    .map(x => x.trim()),
+        learning_style:
+            document.getElementById("learningStyle").value
+    };
 
-            completed:
-                document.getElementById("completed")
-                    .value
-                    .split(",")
-                    .map(x => x.trim()),
+    console.log("Sending profile to backend:", profileData);
 
-            learningStyle:
-                document.getElementById("learningStyle")
-                    .value,
+    try {
 
-            hours:
-                Number(
-                    document.getElementById("hours").value
-                ),
+        const response = await fetch(
+            "http://127.0.0.1:8000/recommend",
+            {
+                method: "POST",
 
-            months:
-                Number(
-                    document.getElementById("months").value
-                )
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        };
+                body: JSON.stringify(profileData)
+            }
+        );
 
+        if (!response.ok) {
+            throw new Error(
+                "Backend returned status " + response.status
+            );
+        }
 
-        /*
-            Temporary frontend storage.
+        const result = await response.json();
 
-            Later your team can replace this
-            with a POST API request.
-        */
+        console.log("Backend response:", result);
 
+        // Save profile
         localStorage.setItem(
             "learnPathProfile",
             JSON.stringify(profileData)
         );
 
+        // Save recommendation returned by backend
+        localStorage.setItem(
+            "recommendation",
+            JSON.stringify(result)
+        );
 
-        window.location.href =
-            "roadmap.html";
+        // Go to roadmap
+        window.location.href = "roadmap.html";
 
+    } catch (error) {
+
+        console.error("Backend connection error:", error);
+
+        alert(
+            "Could not connect to the backend. " +
+            "Make sure FastAPI is running on port 8000."
+        );
     }
-);
+});

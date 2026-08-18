@@ -1,97 +1,192 @@
-const courses = [
+// ======================================================
+// GET BACKEND RESPONSE
+// ======================================================
 
-    {
-        title: "Python Programming Fundamentals",
-        level: "BEGINNER",
-        hours: 15,
-        skills: "Python",
-        prerequisites: "None",
-        project: "Build a CLI expense tracker"
-    },
+const recommendationData =
+    JSON.parse(
+        localStorage.getItem("recommendation")
+    );
 
-    {
-        title: "Statistics for Data Science",
-        level: "BEGINNER",
-        hours: 15,
-        skills: "Statistics",
-        prerequisites: "Python",
-        project: "Analyze a real-world dataset statistically"
-    },
 
-    {
-        title: "Machine Learning Fundamentals",
-        level: "INTERMEDIATE",
-        hours: 25,
-        skills: "Machine Learning",
-        prerequisites: "Python, Statistics, Pandas",
-        project: "House price prediction"
-    },
+if (!recommendationData) {
 
-    {
-        title: "Deep Learning with Neural Networks",
-        level: "ADVANCED",
-        hours: 30,
-        skills: "Deep Learning",
-        prerequisites: "Machine Learning, Python",
-        project: "Build a neural network classifier"
-    },
+    alert(
+        "No recommendation found. Please complete your profile first."
+    );
 
-    {
-        title: "Natural Language Processing",
-        level: "ADVANCED",
-        hours: 25,
-        skills: "NLP",
-        prerequisites: "Machine Learning",
-        project: "Build a sentiment classifier"
-    },
+    window.location.href = "profile.html";
 
-    {
-        title: "Transformers and Modern NLP",
-        level: "ADVANCED",
-        hours: 28,
-        skills: "Transformers",
-        prerequisites: "NLP, Deep Learning",
-        project: "Build a document Q&A prototype"
-    },
+}
 
-    {
-        title: "NumPy for Data Science",
-        level: "BEGINNER",
-        hours: 8,
-        skills: "NumPy",
-        prerequisites: "Python",
-        project: "Analyze a numerical dataset"
-    },
 
-    {
-        title: "Machine Learning Model Evaluation",
-        level: "INTERMEDIATE",
-        hours: 10,
-        skills: "Model Evaluation",
-        prerequisites: "Machine Learning",
-        project: "Compare multiple classifiers"
-    },
+// ======================================================
+// GET PROFILE DATA
+// ======================================================
 
-    {
-        title: "Flask API Development",
-        level: "INTERMEDIATE",
-        hours: 12,
-        skills: "Flask",
-        prerequisites: "Python",
-        project: "Deploy an ML prediction API"
-    },
+const profileData =
+    JSON.parse(
+        localStorage.getItem("learnPathProfile")
+    ) || {};
 
-    {
-        title: "Generative AI Fundamentals",
-        level: "INTERMEDIATE",
-        hours: 15,
-        skills: "Generative AI",
-        prerequisites: "Python",
-        project: "Build a document assistant"
-    }
 
-];
+// ======================================================
+// DATA FROM BACKEND
+// ======================================================
 
+const skillGaps =
+    recommendationData.skill_gaps || [];
+
+const learningPath =
+    recommendationData.learning_path || [];
+
+const goal =
+    recommendationData.goal || "Your Learning Journey";
+
+
+// ======================================================
+// CALCULATE USER SKILLS
+// ======================================================
+
+const userSkills =
+    profileData.skills || [];
+
+
+// ======================================================
+// GOAL
+// ======================================================
+
+const roadmapGoal =
+    document.getElementById(
+        "roadmapGoal"
+    );
+
+roadmapGoal.textContent =
+    goal + " Journey";
+
+
+// ======================================================
+// SUMMARY
+// ======================================================
+
+const skillsHave =
+    document.getElementById(
+        "skillsHave"
+    );
+
+const skillsToLearn =
+    document.getElementById(
+        "skillsToLearn"
+    );
+
+const recommendedSteps =
+    document.getElementById(
+        "recommendedSteps"
+    );
+
+
+// Number of skills user already has
+
+skillsHave.textContent =
+    userSkills.length;
+
+
+// Number of missing skills
+
+skillsToLearn.textContent =
+    skillGaps.length;
+
+
+// Number of recommended courses
+
+recommendedSteps.textContent =
+    learningPath.length;
+
+
+// ======================================================
+// READINESS PERCENTAGE
+// ======================================================
+
+// Simple readiness calculation
+
+const totalSkills =
+    userSkills.length +
+    skillGaps.length;
+
+let readiness = 100;
+
+if (totalSkills > 0) {
+
+    readiness =
+        Math.round(
+            (userSkills.length / totalSkills) * 100
+        );
+
+}
+
+
+// Display readiness
+
+document.getElementById(
+    "readinessPercentage"
+).textContent =
+    readiness + "%";
+
+
+document.getElementById(
+    "readinessText"
+).textContent =
+    readiness + "% ready";
+
+
+// ======================================================
+// SKILL TAGS
+// ======================================================
+
+const skillTags =
+    document.getElementById(
+        "skillTags"
+    );
+
+
+// Skills user already has
+
+userSkills.forEach(skill => {
+
+    const tag =
+        document.createElement("span");
+
+    tag.className =
+        "skill-have";
+
+    tag.textContent =
+        "✓ " + skill;
+
+    skillTags.appendChild(tag);
+
+});
+
+
+// Skills user needs
+
+skillGaps.forEach(skill => {
+
+    const tag =
+        document.createElement("span");
+
+    tag.className =
+        "skill-needed";
+
+    tag.textContent =
+        "→ " + skill;
+
+    skillTags.appendChild(tag);
+
+});
+
+
+// ======================================================
+// ROADMAP
+// ======================================================
 
 const roadmapContainer =
     document.getElementById(
@@ -99,7 +194,7 @@ const roadmapContainer =
     );
 
 
-courses.forEach(
+learningPath.forEach(
     (course, index) => {
 
         const step =
@@ -107,6 +202,12 @@ courses.forEach(
 
         step.className =
             "roadmap-step";
+
+
+        const skills =
+            Array.isArray(course.skills)
+                ? course.skills.join(", ")
+                : course.skills || "N/A";
 
 
         step.innerHTML = `
@@ -121,11 +222,11 @@ courses.forEach(
                 <div class="course-top">
 
                     <span class="level">
-                        ${course.level}
+                        ${course.level || "N/A"}
                     </span>
 
                     <span class="hours">
-                        ${course.hours}h
+                        ${course.duration || "N/A"}
                     </span>
 
                 </div>
@@ -139,18 +240,29 @@ courses.forEach(
                 <div class="course-info">
 
                     <p>
-                        <strong>Skills:</strong>
-                        ${course.skills}
+                        <strong>
+                            Description:
+                        </strong>
+
+                        ${course.description || ""}
                     </p>
 
-                    <p>
-                        <strong>Prerequisites:</strong>
-                        ${course.prerequisites}
-                    </p>
 
                     <p>
-                        <strong>Project:</strong>
-                        ${course.project}
+                        <strong>
+                            Skills:
+                        </strong>
+
+                        ${skills}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Project:
+                        </strong>
+
+                        ${course.project || ""}
                     </p>
 
                 </div>
@@ -173,8 +285,9 @@ courses.forEach(
                         Mark Complete
                     </button>
 
+
                     <button
-                        onclick="giveFeedback('${course.title}')"
+                        onclick="giveFeedback('${course.title.replace(/'/g, "\\'")}')"
                     >
                         Give Feedback
                     </button>
@@ -191,6 +304,10 @@ courses.forEach(
     }
 );
 
+
+// ======================================================
+// COMPLETE COURSE
+// ======================================================
 
 function completeCourse(index) {
 
@@ -222,6 +339,10 @@ function completeCourse(index) {
 }
 
 
+// ======================================================
+// FEEDBACK
+// ======================================================
+
 function giveFeedback(course) {
 
     const feedback =
@@ -241,96 +362,9 @@ function giveFeedback(course) {
 }
 
 
-/* ================= RECOMMENDATIONS ================= */
-
-const recommendations = [
-
-    {
-        title: "Machine Learning Fundamentals",
-        score: "65.3%",
-        description:
-            "Learn supervised and unsupervised learning, training and prediction."
-    },
-
-    {
-        title: "Python Programming Fundamentals",
-        score: "56.7%",
-        description:
-            "Learn Python syntax, functions, collections, OOP and problem solving."
-    },
-
-    {
-        title: "Natural Language Processing",
-        score: "49.2%",
-        description:
-            "Learn text preprocessing, embeddings, classification and NLP pipelines."
-    },
-
-    {
-        title: "Transformers and Modern NLP",
-        score: "48.4%",
-        description:
-            "Understand attention, transformers and modern language-model workflows."
-    },
-
-    {
-        title: "Deep Learning with Neural Networks",
-        score: "48.1%",
-        description:
-            "Understand perceptrons, backpropagation, optimizers and neural networks."
-    },
-
-    {
-        title: "NumPy for Data Science",
-        score: "34.7%",
-        description:
-            "Learn arrays, vectorization and numerical operations."
-    },
-
-    {
-        title: "Statistics for Data Science",
-        score: "33.2%",
-        description:
-            "Learn probability, distributions, hypothesis testing and regression."
-    },
-
-    {
-        title: "Machine Learning Model Evaluation",
-        score: "31.2%",
-        description:
-            "Learn cross-validation, precision, recall, F1 and ROC-AUC."
-    },
-
-    {
-        title: "Flask API Development",
-        score: "30.6%",
-        description:
-            "Build REST APIs and serve machine learning models."
-    },
-
-    {
-        title: "Generative AI Fundamentals",
-        score: "28.1%",
-        description:
-            "Learn LLM concepts, prompting, embeddings and AI application patterns."
-    },
-
-    {
-        title: "Pandas for Data Analysis",
-        score: "27.5%",
-        description:
-            "Clean, transform, analyze and visualize tabular data."
-    },
-
-    {
-        title: "Data Visualization with Python",
-        score: "25.5%",
-        description:
-            "Create meaningful visualizations using Python."
-    }
-
-];
-
+// ======================================================
+// RECOMMENDATIONS
+// ======================================================
 
 const recommendationContainer =
     document.getElementById(
@@ -338,7 +372,7 @@ const recommendationContainer =
     );
 
 
-recommendations.forEach(item => {
+learningPath.forEach(course => {
 
     const card =
         document.createElement("div");
@@ -347,25 +381,57 @@ recommendations.forEach(item => {
         "recommendation-card";
 
 
+    const skills =
+        Array.isArray(course.skills)
+            ? course.skills.join(", ")
+            : course.skills || "N/A";
+
+
     card.innerHTML = `
 
-        <span class="recommendation-score">
-            ${item.score}
-        </span>
-
         <h3>
-            ${item.title}
+            ${course.title}
         </h3>
 
+
         <p>
-            ${item.description}
+            <strong>
+                Level:
+            </strong>
+
+            ${course.level || "N/A"}
         </p>
+
+
+        <p>
+            <strong>
+                Duration:
+            </strong>
+
+            ${course.duration || "N/A"}
+        </p>
+
+
+        <p>
+            <strong>
+                Skills:
+            </strong>
+
+            ${skills}
+        </p>
+
+
+        <p>
+            ${course.description || ""}
+        </p>
+
 
         <p>
             <strong>
                 Why:
             </strong>
-            fits your learning profile
+
+            Recommended based on your learning profile.
         </p>
 
     `;
@@ -374,3 +440,28 @@ recommendations.forEach(item => {
     recommendationContainer.appendChild(card);
 
 });
+
+
+// ======================================================
+// DEBUG
+// ======================================================
+
+console.log(
+    "PROFILE:",
+    profileData
+);
+
+console.log(
+    "BACKEND RESPONSE:",
+    recommendationData
+);
+
+console.log(
+    "SKILL GAPS:",
+    skillGaps
+);
+
+console.log(
+    "LEARNING PATH:",
+    learningPath
+);

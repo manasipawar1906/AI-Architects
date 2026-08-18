@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -10,9 +9,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        LearnPath AI - Dashboard
-    </title>
+    <title>LearnPath AI - Dashboard</title>
 
     <link
         rel="stylesheet"
@@ -23,12 +20,10 @@
         rel="stylesheet"
         href="../css/dashboard.css"
     >
-
 </head>
 
 
 <body>
-
 
 <header class="navbar">
 
@@ -69,19 +64,25 @@
     </div>
 
 
-    <h1>
-        Welcome, Manasi 👋
-    </h1>
+    <!-- USER NAME -->
 
+    <h1 id="welcomeUser">
+        Welcome 👋
+    </h1>
 
     <p class="dashboard-subtitle">
         Track your skills, milestones and next actions.
     </p>
 
 
+    <!-- ========================= -->
     <!-- STATISTICS -->
+    <!-- ========================= -->
 
     <section class="stats-grid">
+
+
+        <!-- OVERALL PROGRESS -->
 
         <div class="stat-card">
 
@@ -96,6 +97,8 @@
         </div>
 
 
+        <!-- COMPLETED COURSES -->
+
         <div class="stat-card">
 
             <span>
@@ -109,18 +112,22 @@
         </div>
 
 
+        <!-- AVAILABLE COURSES -->
+
         <div class="stat-card">
 
             <span>
                 Available Courses
             </span>
 
-            <strong>
-                25
+            <strong id="availableCourses">
+                0
             </strong>
 
         </div>
 
+
+        <!-- STUDY TIME -->
 
         <div class="stat-card">
 
@@ -128,8 +135,8 @@
                 Study Time
             </span>
 
-            <strong>
-                4h/wk
+            <strong id="studyTime">
+                Not set
             </strong>
 
         </div>
@@ -137,9 +144,14 @@
     </section>
 
 
+    <!-- ========================= -->
     <!-- CHARTS -->
+    <!-- ========================= -->
 
     <section class="charts">
+
+
+        <!-- SKILL DEVELOPMENT -->
 
         <div class="chart-card">
 
@@ -147,37 +159,19 @@
                 Skill Development
             </h2>
 
-            <div class="bar-chart">
+            <div
+                class="bar-chart"
+                id="skillChart"
+            >
 
-                <div>
-                    <span style="height: 95%"></span>
-                    <label>Python</label>
-                </div>
-
-                <div>
-                    <span style="height: 25%"></span>
-                    <label>ML</label>
-                </div>
-
-                <div>
-                    <span style="height: 25%"></span>
-                    <label>DL</label>
-                </div>
-
-                <div>
-                    <span style="height: 95%"></span>
-                    <label>NLP</label>
-                </div>
-
-                <div>
-                    <span style="height: 25%"></span>
-                    <label>Transformers</label>
-                </div>
+                <!-- JavaScript will create bars here -->
 
             </div>
 
         </div>
 
+
+        <!-- LEARNING PROGRESS -->
 
         <div class="chart-card">
 
@@ -185,9 +179,15 @@
                 Learning Progress
             </h2>
 
-            <div class="donut">
+            <div
+                class="donut"
+                id="progressDonut"
+            >
 
-                <div class="donut-center">
+                <div
+                    class="donut-center"
+                    id="donutPercentage"
+                >
                     0%
                 </div>
 
@@ -198,7 +198,9 @@
     </section>
 
 
-    <!-- COMPLETED -->
+    <!-- ========================= -->
+    <!-- COMPLETED LEARNING -->
+    <!-- ========================= -->
 
     <section class="completed-section">
 
@@ -210,6 +212,13 @@
             No completed courses yet.
             Start your roadmap to see progress here.
         </p>
+
+
+        <div
+            id="completedList"
+            class="completed-list"
+        >
+        </div>
 
 
         <a
