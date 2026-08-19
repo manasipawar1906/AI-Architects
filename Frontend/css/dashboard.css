@@ -1,316 +1,247 @@
-.dashboard {
-
-    width: min(950px, 90%);
-
-    margin: 40px auto 80px;
-
+.dashboard-header {
+    margin-bottom: 30px;
 }
 
-
-.dashboard h1 {
-
-    font-size: 40px;
-
-    margin-top: 15px;
-
+.dashboard-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
 }
 
-
-.dashboard-subtitle {
-
-    color: #a5aecb;
-
-    margin-top: 10px;
-
+.dashboard-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
-
-/* STATS */
-
-.stats-grid {
-
+/* ================= GRADIENT CARDS ================= */
+.gradient-cards {
     display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap: 12px;
-
-    margin-top: 28px;
-
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
-
-.stat-card {
-
-    padding: 20px;
-
-    background: #151c34;
-
-    border:
-        1px solid #2b3553;
-
-    border-radius: 17px;
-
+.g-card {
+    padding: 24px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 140px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
-
-.stat-card span {
-
-    color: #a5aecb;
-
-    font-size: 11px;
-
+.g-card h3 {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    opacity: 0.9;
 }
 
-
-.stat-card strong {
-
-    display: block;
-
-    font-size: 26px;
-
-    margin-top: 8px;
-
+.g-card strong {
+    font-size: 24px;
+    font-weight: 700;
 }
 
+.g-card.red { background: var(--grad-red); }
+.g-card.blue { background: var(--grad-blue); }
+.g-card.teal { background: var(--grad-teal); }
+.g-card.purple { background: var(--grad-purple); }
 
-/* CHARTS */
 
-.charts {
-
+/* ================= CHARTS SECTION ================= */
+.charts-section {
     display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 15px;
-
-    margin-top: 22px;
-
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
 }
-
 
 .chart-card {
-
-    height: 390px;
-
-    padding: 20px;
-
-    background: #151c34;
-
-    border:
-        1px solid #2b3553;
-
-    border-radius: 18px;
-
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
-
 
 .chart-card h2 {
-
-    font-size: 19px;
-
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: var(--text-primary);
 }
-
 
 /* BAR CHART */
-
 .bar-chart {
-
-    height: 280px;
-
-    margin-top: 30px;
-
+    height: 180px;
     display: flex;
-
     justify-content: space-around;
-
-    align-items: end;
-
-    border-bottom:
-        1px solid #303955;
-
+    align-items: flex-end;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
 }
-
 
 .bar-chart div {
-
-    height: 100%;
-
     display: flex;
-
     flex-direction: column;
-
-    justify-content: end;
-
     align-items: center;
-
+    justify-content: flex-end;
+    height: 100%;
 }
-
 
 .bar-chart span {
-
-    width: 38px;
-
-    background: #397bab;
-
-    display: block;
-
-    border-radius:
-        3px 3px 0 0;
-
+    width: 36px;
+    background: var(--grad-blue);
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 -4px 15px rgba(67, 97, 238, 0.4); /* Neon blue glow */
+    transition: height 0.5s ease;
 }
-
 
 .bar-chart label {
-
-    color: #8993b3;
-
-    font-size: 10px;
-
-    margin-top: 8px;
-
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 12px;
 }
 
-
-/* DONUT */
-
+/* DONUT CHART */
 .donut {
-
-    width: 260px;
-
-    height: 260px;
-
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
-
-    margin: 45px auto;
-
-    background:
-        conic-gradient(
-            #ff5d7d 0% 100%
-        );
-
+    margin: 0 auto;
+    /* Uses accent purple for the progress, dark background for the rest */
+    background: conic-gradient(var(--accent-purple) 0% 33%, var(--bg-main) 33% 100%);
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.15); /* Soft purple glow */
 }
-
 
 .donut::before {
-
     content: "";
-
     position: absolute;
-
 }
-
 
 .donut-center {
-
-    width: 140px;
-
-    height: 140px;
-
+    width: 136px;
+    height: 136px;
     border-radius: 50%;
-
-    background: #151c34;
-
+    background: var(--bg-card);
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
-    font-size: 22px;
-
-    font-weight: bold;
-
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 
-/* COMPLETED */
-
-.completed-section {
-
-    position: relative;
-
-    margin-top: 20px;
-
-    padding: 25px;
-
-    min-height: 110px;
-
-    background: #151c34;
-
-    border:
-        1px solid #2b3553;
-
-    border-radius: 18px;
-
+/* ================= AI REC BOX / COMPLETED SECTION ================= */
+.ai-recommendation {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
+.ai-recommendation .icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--accent-purple);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+}
 
-.completed-section p {
+.ai-recommendation h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
 
-    margin-top: 15px;
-
-    color: #9fa9c7;
-
+.ai-recommendation p {
     font-size: 13px;
-
+    color: var(--text-secondary);
 }
 
-
-.back-btn {
-
-    position: absolute;
-
-    right: 20px;
-
-    top: 20px;
-
-    padding: 8px 13px;
-
-    border-radius: 8px;
-
-    border: 1px solid #35405f;
-
-    color: white;
-
-    text-decoration: none;
-
-    font-size: 12px;
-
-}
-
-
+/* RESPONSIVE */
 @media(max-width: 800px) {
-
-    .stats-grid {
-
+    .gradient-cards, .charts-section {
         grid-template-columns: 1fr 1fr;
-
     }
-
-    .charts {
-
-        grid-template-columns: 1fr;
-
-    }
-
 }
-
 
 @media(max-width: 500px) {
-
-    .stats-grid {
-
+    .gradient-cards, .charts-section {
         grid-template-columns: 1fr;
-
     }
+}
 
+.bar-chart div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.bar-chart span {
+    width: 36px;
+    background: var(--grad-blue);
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 -4px 15px rgba(67, 97, 238, 0.4); /* Neon blue glow */
+    transition: height 0.5s ease;
+}
+
+.bar-chart label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 12px;
+}
+
+/* DONUT CHART */
+.donut {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    margin: 0 auto;
+    /* Uses accent purple for the progress, dark background for the rest */
+    background: conic-gradient(var(--accent-purple) 0% 33%, var(--bg-main) 33% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.15); /* Soft purple glow */
+}
+
+.donut::before {
+    content: "";
+    position: absolute;
+}
+
+.donut-center {
+    width: 136px;
+    height: 136px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* RESPONSIVE */
+@media(max-width: 800px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
 }

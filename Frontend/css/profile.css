@@ -1,227 +1,71 @@
-.profile-page {
-
-    width: min(900px, 90%);
-
-    margin: 45px auto 80px;
-
-}
-
-
-.step-badge {
-
-    display: inline-block;
-
-    padding: 8px 14px;
-
-    border-radius: 20px;
-
-    border:
-        1px solid #5145c9;
-
-    background:
-        rgba(86, 72, 230, 0.08);
-
-    color: #9c8fff;
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    letter-spacing: 0.5px;
-
-    margin-bottom: 14px;
-
-}
-
-
-.profile-page h1 {
-
-    font-size: 40px;
-
-    line-height: 1.2;
-
-    margin-bottom: 12px;
-
-}
-
-
-.page-description {
-
-    color: #9fa9c7;
-
-    margin-bottom: 32px;
-
-}
-
-
-/* ================= CARD ================= */
+.profile-header { margin-bottom: 30px; }
+.profile-header h1 { font-size: 28px; margin-bottom: 5px; }
+.profile-header p { color: var(--text-secondary); font-size: 14px; }
 
 .profile-card {
-
-    background:
-        rgba(21, 28, 50, 0.92);
-
-    border:
-        1px solid #2c3553;
-
-    border-radius: 21px;
-
-    padding: 27px;
-
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 800px;
 }
-
-
-/* ================= FORM ================= */
 
 .form-row {
-
     display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 16px;
-
-    margin-bottom: 16px;
-
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-
-.three-columns {
-
-    grid-template-columns:
-        1fr 1fr 1fr;
-
-}
-
+.three-columns { grid-template-columns: 1fr 1fr 1fr; }
 
 .form-group {
-
     display: flex;
-
     flex-direction: column;
-
     gap: 8px;
-
-    margin-bottom: 16px;
-
+    margin-bottom: 20px;
 }
-
 
 .form-group label {
-
-    font-size: 14px;
-
+    font-size: 13px;
     font-weight: 600;
-
+    color: var(--text-secondary);
 }
 
+.form-group label span { font-size: 11px; opacity: 0.7; font-weight: normal; }
 
-.form-group label span {
-
-    font-size: 11px;
-
-    color: #737d9d;
-
-    font-weight: normal;
-
-}
-
-
-.form-group input,
-.form-group select {
-
-    height: 40px;
-
-    padding: 0 13px;
-
+.form-group input, .form-group select {
+    height: 44px;
+    padding: 0 16px;
     border-radius: 10px;
-
-    border:
-        1px solid #2c3554;
-
-    background: #0c1327;
-
-    color: #f4f6ff;
-
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.03);
+    color: white;
+    font-size: 14px;
     outline: none;
-
+    transition: 0.2s;
 }
 
+.form-group select option { background: var(--bg-card); color: white; }
 
-.form-group input:focus,
-.form-group select:focus {
-
-    border-color: #7665ff;
-
-    box-shadow:
-        0 0 0 2px
-        rgba(118, 101, 255, 0.12);
-
+.form-group input:focus, .form-group select:focus {
+    border-color: var(--accent-purple);
+    background: rgba(124, 58, 237, 0.05);
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
 }
-
-
-/* ================= BUTTON ================= */
 
 .generate-btn {
-
     width: 100%;
-
-    height: 42px;
-
-    margin-top: 8px;
-
+    height: 48px;
+    margin-top: 10px;
     border: none;
-
     border-radius: 10px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #7867ff,
-            #5c4ce8
-        );
-
+    background: var(--accent-gradient);
     color: white;
-
-    font-size: 13px;
-
+    font-size: 14px;
     font-weight: 700;
-
     cursor: pointer;
-
-    transition: 0.25s;
-
+    transition: 0.2s;
 }
 
-
-.generate-btn:hover {
-
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 10px 25px
-        rgba(102, 86, 245, 0.25);
-
-}
-
-
-/* ================= MOBILE ================= */
-
-@media(max-width: 700px) {
-
-    .profile-page h1 {
-
-        font-size: 30px;
-
-    }
-
-    .form-row,
-    .three-columns {
-
-        grid-template-columns: 1fr;
-
-    }
-
-}
+.generate-btn:hover { box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); transform: translateY(-1px); }
