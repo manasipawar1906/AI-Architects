@@ -4,12 +4,23 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>LearnPath AI - Profile</title>
 
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/profile.css">
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/profile.css"
+    >
 
 </head>
 
@@ -24,19 +35,26 @@
         LearnPath <span>AI</span>
     </div>
 
+
     <nav>
 
-        <a href="profile.html" class="active">
+        <a
+            href="profile.html"
+            class="active"
+        >
             Profile
         </a>
+
 
         <a href="roadmap.html">
             Roadmap
         </a>
 
+
         <a href="dashboard.html">
             Dashboard
         </a>
+
 
         <a href="assistant.html">
             AI Assistant
@@ -70,10 +88,18 @@
 
     <section class="profile-card">
 
-        <form id="profileForm">
+        <!-- IMPORTANT:
+             autocomplete="off" prevents browser
+             from intentionally restoring old form data.
+        -->
+
+        <form
+            id="profileForm"
+            autocomplete="off"
+        >
 
 
-            <!-- NAME -->
+            <!-- ================= NAME ================= -->
 
             <div class="form-row">
 
@@ -83,18 +109,19 @@
                         Name
                     </label>
 
+
                     <input
                         type="text"
                         id="name"
-                        value="Manasi Madhukar Pawar"
                         placeholder="Enter your name"
+                        autocomplete="off"
                         required
                     >
 
                 </div>
 
 
-                <!-- EMAIL -->
+                <!-- ================= EMAIL ================= -->
 
                 <div class="form-group">
 
@@ -102,10 +129,12 @@
                         Email
                     </label>
 
+
                     <input
                         type="email"
                         id="email"
                         placeholder="Enter your email"
+                        autocomplete="off"
                         required
                     >
 
@@ -114,7 +143,7 @@
             </div>
 
 
-            <!-- CAREER -->
+            <!-- ================= CAREER ================= -->
 
             <div class="form-row">
 
@@ -124,21 +153,41 @@
                         Career / Learning Goal
                     </label>
 
-                    <select id="career">
 
-                        <option>NLP Engineer</option>
+                    <select
+                        id="career"
+                        autocomplete="off"
+                        required
+                    >
+
+                        <option
+                            value=""
+                            disabled
+                            selected
+                        >
+                            Select your goal
+                        </option>
+
+
+                        <option>
+                            NLP Engineer
+                        </option>
+
 
                         <option>
                             Machine Learning Engineer
                         </option>
 
+
                         <option>
                             Data Scientist
                         </option>
 
+
                         <option>
                             AI Engineer
                         </option>
+
 
                         <option>
                             Data Analyst
@@ -149,7 +198,7 @@
                 </div>
 
 
-                <!-- EXPERIENCE -->
+                <!-- ================= EXPERIENCE ================= -->
 
                 <div class="form-group">
 
@@ -157,13 +206,31 @@
                         Experience Level
                     </label>
 
-                    <select id="experience">
 
-                        <option>Beginner</option>
+                    <select
+                        id="experience"
+                        autocomplete="off"
+                        required
+                    >
+
+                        <option
+                            value=""
+                            disabled
+                            selected
+                        >
+                            Select experience level
+                        </option>
+
+
+                        <option>
+                            Beginner
+                        </option>
+
 
                         <option>
                             Intermediate
                         </option>
+
 
                         <option>
                             Advanced
@@ -176,69 +243,87 @@
             </div>
 
 
-            <!-- CURRENT SKILLS -->
+            <!-- ================= CURRENT SKILLS ================= -->
 
             <div class="form-group">
 
                 <label>
+
                     Current Skills
-                    <span>Comma separated</span>
+
+                    <span>
+                        Comma separated
+                    </span>
+
                 </label>
+
 
                 <input
                     type="text"
                     id="skills"
-                    value="Python, C, C++, NLP"
                     placeholder="Python, C++, NLP"
+                    autocomplete="off"
                 >
 
             </div>
 
 
-            <!-- INTERESTS -->
+            <!-- ================= INTERESTS ================= -->
 
             <div class="form-group">
 
                 <label>
+
                     Interests
-                    <span>Comma separated</span>
+
+                    <span>
+                        Comma separated
+                    </span>
+
                 </label>
+
 
                 <input
                     type="text"
                     id="interests"
-                    value="Machine Learning, Data Science, AI"
                     placeholder="Machine Learning, AI"
+                    autocomplete="off"
                 >
 
             </div>
 
 
-            <!-- COMPLETED -->
+            <!-- ================= COMPLETED ================= -->
 
             <div class="form-group">
 
                 <label>
+
                     Completed Courses / Skills
-                    <span>Comma separated</span>
+
+                    <span>
+                        Comma separated
+                    </span>
+
                 </label>
+
 
                 <input
                     type="text"
                     id="completed"
-                    value="Python, C, C++"
                     placeholder="Python, C"
+                    autocomplete="off"
                 >
 
             </div>
 
 
-            <!-- LAST ROW -->
+            <!-- ================= LAST ROW ================= -->
 
             <div class="form-row three-columns">
 
 
-                <!-- LEARNING STYLE -->
+                <!-- ================= LEARNING STYLE ================= -->
 
                 <div class="form-group">
 
@@ -246,19 +331,36 @@
                         Learning Style
                     </label>
 
-                    <select id="learningStyle">
+
+                    <select
+                        id="learningStyle"
+                        autocomplete="off"
+                        required
+                    >
+
+                        <option
+                            value=""
+                            disabled
+                            selected
+                        >
+                            Select learning style
+                        </option>
+
 
                         <option>
                             Mixed
                         </option>
 
+
                         <option>
                             Visual
                         </option>
 
+
                         <option>
                             Reading
                         </option>
+
 
                         <option>
                             Hands-on
@@ -269,7 +371,7 @@
                 </div>
 
 
-                <!-- HOURS -->
+                <!-- ================= HOURS ================= -->
 
                 <div class="form-group">
 
@@ -277,17 +379,20 @@
                         Hours / Week
                     </label>
 
+
                     <input
                         type="number"
                         id="hours"
-                        value="4"
+                        placeholder="Enter hours per week"
                         min="1"
+                        autocomplete="off"
+                        required
                     >
 
                 </div>
 
 
-                <!-- MONTHS -->
+                <!-- ================= MONTHS ================= -->
 
                 <div class="form-group">
 
@@ -295,11 +400,14 @@
                         Target Months
                     </label>
 
+
                     <input
                         type="number"
                         id="months"
-                        value="7"
+                        placeholder="Enter target months"
                         min="1"
+                        autocomplete="off"
+                        required
                     >
 
                 </div>
@@ -307,7 +415,7 @@
             </div>
 
 
-            <!-- BUTTON -->
+            <!-- ================= BUTTON ================= -->
 
             <button
                 type="submit"
