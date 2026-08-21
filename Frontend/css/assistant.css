@@ -88,3 +88,115 @@
 }
 
 #chatForm button:hover { box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); }
+
+/* =========================================================
+   AI RESPONSE FORMATTING
+   ========================================================= */
+
+.message.ai {
+    line-height: 1.6;
+}
+
+
+/* Headings */
+
+.message.ai h1,
+.message.ai h2,
+.message.ai h3 {
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+
+
+.message.ai h1 {
+    font-size: 1.4rem;
+}
+
+
+.message.ai h2 {
+    font-size: 1.2rem;
+}
+
+
+.message.ai h3 {
+    font-size: 1.05rem;
+}
+
+
+/* Lists */
+
+.message.ai ul {
+    margin: 8px 0 12px 20px;
+    padding-left: 18px;
+}
+
+
+.message.ai li {
+    margin-bottom: 5px;
+}
+
+
+/* Horizontal line */
+
+.message.ai hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 12px 0;
+}
+
+
+/* Inline code */
+
+.message.ai code {
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.25);
+    font-family: monospace;
+}
+
+
+/* Code blocks */
+
+.message.ai .ai-code {
+    margin: 10px 0;
+    padding: 12px;
+    overflow-x: auto;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+
+.message.ai .ai-code code {
+    background: none;
+    padding: 0;
+}
+
+
+/* Tables */
+
+.message.ai .ai-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin: 12px 0;
+}
+
+
+.message.ai table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+
+.message.ai th,
+.message.ai td {
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: left;
+    vertical-align: top;
+}
+
+
+.message.ai th {
+    font-weight: 600;
+}
