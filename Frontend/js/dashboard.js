@@ -1,6 +1,6 @@
 // ============================================================
 // LEARNPATH AI - DASHBOARD
-// MULTI-PROFILE + ML CONNECTED VERSION
+// Multi-profile + ML + Skill Progress
 // ============================================================
 
 const BACKEND_URL =
@@ -20,12 +20,20 @@ document.addEventListener(
 async function loadDashboard() {
 
     console.log(
-        "Loading selected learning profile..."
+        "================================"
+    );
+
+    console.log(
+        "LEARNPATH AI - DASHBOARD"
+    );
+
+    console.log(
+        "================================"
     );
 
 
     // ---------------------------------------------------------
-    // GET SELECTED PROFILE
+    // SELECTED PROFILE
     // ---------------------------------------------------------
 
     const profile =
@@ -65,7 +73,7 @@ async function loadDashboard() {
 
 
     // ---------------------------------------------------------
-    // GET RECOMMENDATION
+    // RECOMMENDATION
     // ---------------------------------------------------------
 
     let recommendation =
@@ -74,7 +82,8 @@ async function loadDashboard() {
 
     if (
         !recommendation ||
-        typeof recommendation !== "object"
+        typeof recommendation !==
+            "object"
     ) {
 
         try {
@@ -85,18 +94,21 @@ async function loadDashboard() {
                 );
 
 
+            const learningPath =
+                getLearningPath(
+                    recommendation
+                );
+
+
             updateSelectedProfile({
 
                 recommendation,
 
                 totalRoadmapCourses:
-                    Array.isArray(
-                        recommendation.learning_path
-                    )
-                        ? recommendation.learning_path.length
-                        : 0
+                    learningPath.length
 
             });
+
 
         } catch (error) {
 
@@ -106,10 +118,15 @@ async function loadDashboard() {
             );
 
 
-            recommendation = null;
+            recommendation =
+                null;
         }
     }
 
+
+    // ---------------------------------------------------------
+    // NO RECOMMENDATION
+    // ---------------------------------------------------------
 
     if (!recommendation) {
 
@@ -120,7 +137,7 @@ async function loadDashboard() {
 
 
     console.log(
-        "Recommendation for selected profile:",
+        "Recommendation:",
         recommendation
     );
 
@@ -144,6 +161,10 @@ async function loadDashboard() {
             profile
         );
 
+
+    // ---------------------------------------------------------
+    // COMPLETED COURSES CARD
+    // ---------------------------------------------------------
 
     const completedElement =
         document.getElementById(
@@ -175,7 +196,7 @@ async function loadDashboard() {
 
 
     // ---------------------------------------------------------
-    // AVAILABLE / REMAINING COURSES
+    // AVAILABLE COURSES
     // ---------------------------------------------------------
 
     const availableCourses =
@@ -200,7 +221,7 @@ async function loadDashboard() {
 
 
     // ---------------------------------------------------------
-    // CURRENT SKILLS
+    // ACHIEVED SKILLS
     // ---------------------------------------------------------
 
     const currentSkills =
@@ -214,10 +235,51 @@ async function loadDashboard() {
     // SKILL GAPS
     // ---------------------------------------------------------
 
-    const skillGaps =
+    let skillGaps =
         getSkillGaps(
             recommendation
         );
+
+
+    // ---------------------------------------------------------
+    // REMOVE ACHIEVED SKILLS FROM GAPS
+    // ---------------------------------------------------------
+
+    skillGaps =
+        skillGaps.filter(
+            gap => {
+
+                return !currentSkills.some(
+                    skill =>
+                        normalizeText(
+                            skill
+                        ) ===
+                        normalizeText(
+                            gap
+                        )
+                );
+            }
+        );
+
+
+    // ---------------------------------------------------------
+    // SKILLS YOU HAVE
+    // ---------------------------------------------------------
+
+    setText(
+        "skillsHave",
+        currentSkills.length
+    );
+
+
+    // ---------------------------------------------------------
+    // SKILLS TO LEARN
+    // ---------------------------------------------------------
+
+    setText(
+        "skillsToLearn",
+        skillGaps.length
+    );
 
 
     // ---------------------------------------------------------
@@ -231,10 +293,21 @@ async function loadDashboard() {
 
 
     // ---------------------------------------------------------
-    // OVERALL COURSE PROGRESS
+    // GOAL READINESS
+    // ---------------------------------------------------------
+
+    let readiness =
+        calculateReadiness(
+            recommendation,
+            currentSkills,
+            skillGaps
+        );
+
+
+    // ---------------------------------------------------------
+    // UPDATE OVERALL PROGRESS
     //
-    // Overall Progress is based on actual completed
-    // roadmap courses, not goal readiness.
+    // This is course completion progress.
     // ---------------------------------------------------------
 
     let overallProgress =
@@ -263,6 +336,10 @@ async function loadDashboard() {
         );
 
 
+    // ---------------------------------------------------------
+    // UPDATE PROGRESS
+    // ---------------------------------------------------------
+
     updateProgress(
         overallProgress
     );
@@ -282,31 +359,41 @@ async function loadDashboard() {
     // ---------------------------------------------------------
 
     console.log(
-        "Dashboard loaded successfully."
+        "--------------------------------"
     );
 
+    console.log(
+        "Achieved skills:",
+        currentSkills
+    );
+
+    console.log(
+        "Skills to learn:",
+        skillGaps
+    );
+
+    console.log(
+        "Goal readiness:",
+        `${readiness}%`
+    );
 
     console.log(
         "Completed courses:",
         completedCourses.length
     );
 
-
     console.log(
         "Total roadmap courses:",
         totalRoadmapCourses
     );
 
-
-    console.log(
-        "Available courses:",
-        remainingCourses
-    );
-
-
     console.log(
         "Overall progress:",
         `${overallProgress}%`
+    );
+
+    console.log(
+        "--------------------------------"
     );
 }
 
@@ -365,7 +452,7 @@ function getSelectedProfile() {
 
 
         // -----------------------------------------------------
-        // Backward compatibility
+        // BACKWARD COMPATIBILITY
         // -----------------------------------------------------
 
         const oldProfile =
@@ -380,6 +467,7 @@ function getSelectedProfile() {
                 oldProfile
             );
         }
+
 
     } catch (error) {
 
@@ -449,7 +537,9 @@ function updateSelectedProfile(
             );
 
 
-        if (index === -1) {
+        if (
+            index === -1
+        ) {
 
             return;
         }
@@ -480,6 +570,7 @@ function updateSelectedProfile(
             )
         );
 
+
     } catch (error) {
 
         console.error(
@@ -500,7 +591,9 @@ async function fetchRecommendation(
 
     if (
         !profile ||
-        Object.keys(profile).length === 0
+        Object.keys(
+            profile
+        ).length === 0
     ) {
 
         throw new Error(
@@ -528,7 +621,9 @@ async function fetchRecommendation(
         );
 
 
-    if (!response.ok) {
+    if (
+        !response.ok
+    ) {
 
         const errorText =
             await response.text();
@@ -631,9 +726,7 @@ function updateStudyTime(
         profile.hours_per_week ||
         profile.hoursPerWeek ||
         profile.hours_per_day ||
-        profile.hoursPerDay ||
-        profile.daily_hours ||
-        profile.dailyHours;
+        profile.hoursPerDay;
 
 
     if (
@@ -644,17 +737,6 @@ function updateStudyTime(
 
         element.textContent =
             "Not set";
-
-        return;
-    }
-
-
-    if (
-        typeof studyTime === "string"
-    ) {
-
-        element.textContent =
-            studyTime;
 
         return;
     }
@@ -697,7 +779,7 @@ function getCompletedCourses(
 ) {
 
     // ---------------------------------------------------------
-    // CURRENT MULTI-PROFILE SOURCE
+    // CURRENT SELECTED PROFILE
     // ---------------------------------------------------------
 
     if (
@@ -712,7 +794,7 @@ function getCompletedCourses(
 
 
     // ---------------------------------------------------------
-    // ALTERNATIVE PROFILE FIELD
+    // ALTERNATIVE FIELD
     // ---------------------------------------------------------
 
     if (
@@ -727,7 +809,7 @@ function getCompletedCourses(
 
 
     // ---------------------------------------------------------
-    // LEGACY STORAGE FALLBACK
+    // OLD STORAGE
     // ---------------------------------------------------------
 
     try {
@@ -764,6 +846,7 @@ function getCompletedCourses(
             error
         );
 
+
         return [];
     }
 }
@@ -778,7 +861,10 @@ function getCurrentSkills(
     profile
 ) {
 
-    // Backend response
+    // ---------------------------------------------------------
+    // BACKEND RESPONSE
+    // ---------------------------------------------------------
+
     if (
         recommendation &&
         Array.isArray(
@@ -791,6 +877,10 @@ function getCurrentSkills(
         );
     }
 
+
+    // ---------------------------------------------------------
+    // PROFILE
+    // ---------------------------------------------------------
 
     const fields = [
 
@@ -836,7 +926,8 @@ function getCurrentSkills(
 
 
         if (
-            typeof value === "string"
+            typeof value ===
+            "string"
         ) {
 
             return uniqueSkills(
@@ -890,7 +981,8 @@ function extractSkillName(
 ) {
 
     if (
-        typeof skill === "string"
+        typeof skill ===
+        "string"
     ) {
 
         return skill.trim();
@@ -899,7 +991,8 @@ function extractSkillName(
 
     if (
         skill &&
-        typeof skill === "object"
+        typeof skill ===
+            "object"
     ) {
 
         return (
@@ -932,6 +1025,7 @@ function uniqueSkills(
 
     const result =
         [];
+
 
     const seen =
         new Set();
@@ -987,11 +1081,7 @@ function uniqueSkills(
 
 
 // ============================================================
-// CALCULATE READINESS
-// ============================================================
-//
-// Kept for compatibility.
-// This is GOAL READINESS, not overall course progress.
+// GOAL READINESS
 // ============================================================
 
 function calculateReadiness(
@@ -999,6 +1089,10 @@ function calculateReadiness(
     currentSkills,
     skillGaps
 ) {
+
+    // ---------------------------------------------------------
+    // PREFER BACKEND VALUE
+    // ---------------------------------------------------------
 
     if (
         recommendation &&
@@ -1021,13 +1115,17 @@ function calculateReadiness(
     }
 
 
+    // ---------------------------------------------------------
+    // FALLBACK
+    // ---------------------------------------------------------
+
     const existing =
         new Set(
             currentSkills.map(
                 skill =>
-                    skill
-                        .trim()
-                        .toLowerCase()
+                    normalizeText(
+                        skill
+                    )
             )
         );
 
@@ -1036,9 +1134,9 @@ function calculateReadiness(
         new Set(
             skillGaps.map(
                 skill =>
-                    skill
-                        .trim()
-                        .toLowerCase()
+                    normalizeText(
+                        skill
+                    )
             )
         );
 
@@ -1059,20 +1157,14 @@ function calculateReadiness(
 
 
     return clamp(
-
         Math.round(
-
             (
                 existing.size /
                 total
             ) * 100
-
         ),
-
         0,
-
         100
-
     );
 }
 
@@ -1118,7 +1210,7 @@ function updateProgress(
 
 
 // ============================================================
-// DONUT
+// UPDATE DONUT
 // ============================================================
 
 function updateDonut(
@@ -1146,7 +1238,7 @@ function updateDonut(
 
 
 // ============================================================
-// SKILL CHART
+// UPDATE SKILL CHART
 // ============================================================
 
 function updateSkillChart(
@@ -1174,14 +1266,17 @@ function updateSkillChart(
         new Map();
 
 
-    // Current skills
+    // ---------------------------------------------------------
+    // ACHIEVED SKILLS
+    // ---------------------------------------------------------
+
     currentSkills.forEach(
         skill => {
 
             const key =
-                skill
-                    .trim()
-                    .toLowerCase();
+                normalizeText(
+                    skill
+                );
 
 
             skillMap.set(
@@ -1191,21 +1286,24 @@ function updateSkillChart(
                         skill,
 
                     percentage:
-                        90
+                        100
                 }
             );
         }
     );
 
 
-    // Skill gaps
+    // ---------------------------------------------------------
+    // SKILL GAPS
+    // ---------------------------------------------------------
+
     skillGaps.forEach(
         skill => {
 
             const key =
-                skill
-                    .trim()
-                    .toLowerCase();
+                normalizeText(
+                    skill
+                );
 
 
             if (
@@ -1362,26 +1460,26 @@ function updateCompletedLearning(
 
 
     const names =
-        completedCourses
-            .map(
-                course => {
+        completedCourses.map(
+            course => {
 
-                    if (
-                        typeof course === "string"
-                    ) {
+                if (
+                    typeof course ===
+                    "string"
+                ) {
 
-                        return course;
-                    }
-
-
-                    return (
-                        course.title ||
-                        course.name ||
-                        course.course ||
-                        "Completed course"
-                    );
+                    return course;
                 }
-            );
+
+
+                return (
+                    course.title ||
+                    course.name ||
+                    course.course ||
+                    "Completed course"
+                );
+            }
+        );
 
 
     if (
@@ -1430,8 +1528,25 @@ function updateEmptyDashboard() {
 
 
     setText(
+        "skillsHave",
+        "0"
+    );
+
+
+    setText(
+        "skillsToLearn",
+        "0"
+    );
+
+
+    setText(
         "donutPercentage",
         "0%"
+    );
+
+
+    updateDonut(
+        0
     );
 
 
@@ -1453,11 +1568,6 @@ function updateEmptyDashboard() {
 
         `;
     }
-
-
-    updateDonut(
-        0
-    );
 
 
     const message =
@@ -1541,4 +1651,20 @@ function clamp(
             value
         )
     );
+}
+
+
+// ============================================================
+// NORMALIZE TEXT
+// ============================================================
+
+function normalizeText(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .trim()
+        .toLowerCase();
 }

@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,23 +10,29 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>LearnPath AI - Dashboard</title>
+    <title>
+        LearnPath AI - Dashboard
+    </title>
+
 
     <link
         rel="stylesheet"
         href="../css/style.css"
     >
 
+
     <link
         rel="stylesheet"
         href="../css/dashboard.css"
     >
+
 </head>
 
 
 <body>
 
 <div class="app-container">
+
 
     <!-- =====================================================
          SIDEBAR
@@ -34,7 +41,12 @@
     <aside class="sidebar">
 
         <div class="logo">
-            🧠 LearnPath <span>AI</span>
+
+            🧠 LearnPath
+            <span>
+                AI
+            </span>
+
         </div>
 
 
@@ -44,9 +56,11 @@
                 My Learning
             </a>
 
+
             <a href="roadmap.html">
                 Roadmaps
             </a>
+
 
             <a
                 href="dashboard.html"
@@ -54,6 +68,7 @@
             >
                 Dashboard
             </a>
+
 
             <a href="assistant.html">
                 AI Assistant
@@ -77,17 +92,19 @@
 
         <header
             class="top-bar"
-            style="justify-content: flex-end;"
+            style="
+                justify-content:flex-end;
+            "
         >
 
             <div class="user-profile">
 
                 <div class="user-info">
 
-                    <!-- Filled dynamically by dashboard.js -->
                     <strong id="topNavName">
                         Student
                     </strong>
+
 
                     <span>
                         Student
@@ -100,7 +117,6 @@
         </header>
 
 
-
         <!-- =================================================
              DASHBOARD HEADER
              ================================================= -->
@@ -111,6 +127,7 @@
                 Welcome back! 👋
             </h1>
 
+
             <p>
                 Your personalized learning journey continues
             </p>
@@ -118,15 +135,16 @@
         </div>
 
 
-
         <!-- =================================================
-             GRADIENT CARDS
+             DASHBOARD CARDS
              ================================================= -->
 
         <section class="gradient-cards">
 
 
-            <!-- OVERALL PROGRESS -->
+            <!-- =================================================
+                 OVERALL PROGRESS
+                 ================================================= -->
 
             <div class="g-card red">
 
@@ -134,7 +152,7 @@
                     Overall Progress
                 </h3>
 
-                <!-- Dynamic -->
+
                 <strong id="progress">
                     0%
                 </strong>
@@ -142,8 +160,9 @@
             </div>
 
 
-
-            <!-- COMPLETED COURSES -->
+            <!-- =================================================
+                 COMPLETED COURSES
+                 ================================================= -->
 
             <div class="g-card blue">
 
@@ -151,7 +170,7 @@
                     Completed Courses
                 </h3>
 
-                <!-- Dynamic -->
+
                 <strong id="completed">
                     0
                 </strong>
@@ -159,8 +178,45 @@
             </div>
 
 
+            <!-- =================================================
+                 SKILLS YOU HAVE
+                 ================================================= -->
 
-            <!-- AVAILABLE COURSES -->
+            <div class="g-card teal">
+
+                <h3>
+                    Skills You Have
+                </h3>
+
+
+                <strong id="skillsHave">
+                    0
+                </strong>
+
+            </div>
+
+
+            <!-- =================================================
+                 SKILLS TO LEARN
+                 ================================================= -->
+
+            <div class="g-card purple">
+
+                <h3>
+                    Skills To Learn
+                </h3>
+
+
+                <strong id="skillsToLearn">
+                    0
+                </strong>
+
+            </div>
+
+
+            <!-- =================================================
+                 AVAILABLE COURSES
+                 ================================================= -->
 
             <div class="g-card teal">
 
@@ -168,7 +224,7 @@
                     Available Courses
                 </h3>
 
-                <!-- Dynamic -->
+
                 <strong id="availableCourses">
                     0
                 </strong>
@@ -176,8 +232,9 @@
             </div>
 
 
-
-            <!-- STUDY TIME -->
+            <!-- =================================================
+                 STUDY TIME
+                 ================================================= -->
 
             <div class="g-card purple">
 
@@ -185,7 +242,7 @@
                     Study Time
                 </h3>
 
-                <!-- Dynamic -->
+
                 <strong id="studyTime">
                     Not set
                 </strong>
@@ -194,7 +251,6 @@
 
 
         </section>
-
 
 
         <!-- =================================================
@@ -214,30 +270,23 @@
                     Skill Development
                 </h2>
 
-                <!--
-
-                    dashboard.js will generate the
-                    skill bars here from:
-
-                    - Current skills
-                    - Skill gaps
-                    - ML recommendation
-
-                -->
 
                 <div
                     class="bar-chart"
                     id="skillChart"
                 >
 
-                    <p style="opacity: 0.7;">
+                    <p
+                        style="
+                            opacity:0.7;
+                        "
+                    >
                         Loading skill development...
                     </p>
 
                 </div>
 
             </div>
-
 
 
             <!-- =================================================
@@ -271,7 +320,6 @@
         </section>
 
 
-
         <!-- =================================================
              COMPLETED LEARNING
              ================================================= -->
@@ -291,8 +339,11 @@
 
 
                 <p id="completedMessage">
+
                     No completed courses yet.
-                    Start your roadmap to see progress here.
+                    Start your roadmap to see
+                    progress here.
+
                 </p>
 
             </div>
@@ -303,7 +354,6 @@
     </main>
 
 </div>
-
 
 
 <!-- =========================================================

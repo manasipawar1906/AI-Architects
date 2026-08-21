@@ -1,11 +1,16 @@
 // =========================================================
 // LEARNPATH AI - ROADMAP
-// Multi-profile + Dynamic ML Roadmap
+// Multi-profile + Dynamic ML Roadmap + Skill Achievement
 // =========================================================
 
-const BACKEND_URL = "http://127.0.0.1:8000";
+const BACKEND_URL =
+    "http://127.0.0.1:8000";
 
-document.addEventListener("DOMContentLoaded", loadRoadmap);
+
+document.addEventListener(
+    "DOMContentLoaded",
+    loadRoadmap
+);
 
 
 // =========================================================
@@ -14,67 +19,126 @@ document.addEventListener("DOMContentLoaded", loadRoadmap);
 
 async function loadRoadmap() {
 
-    console.log("================================");
-    console.log("LEARNPATH AI - LOADING ROADMAP");
-    console.log("================================");
+    console.log(
+        "================================"
+    );
 
-    let profileData = getSelectedProfile();
+    console.log(
+        "LEARNPATH AI - LOADING ROADMAP"
+    );
 
-    // Fallback for older single-profile storage
+    console.log(
+        "================================"
+    );
+
+
+    // ---------------------------------------------------------
+    // GET SELECTED PROFILE
+    // ---------------------------------------------------------
+
+    let profileData =
+        getSelectedProfile();
+
+
+    // ---------------------------------------------------------
+    // FALLBACK TO SESSION PROFILE
+    // ---------------------------------------------------------
+
     if (!profileData) {
+
         try {
-            const stored = sessionStorage.getItem("learnPathProfile");
+
+            const stored =
+                sessionStorage.getItem(
+                    "learnPathProfile"
+                );
+
 
             if (stored) {
-                profileData = JSON.parse(stored);
+
+                profileData =
+                    JSON.parse(
+                        stored
+                    );
             }
+
         } catch (error) {
-            console.error("Session profile error:", error);
+
+            console.error(
+                "Session profile error:",
+                error
+            );
         }
     }
 
-    if (!profileData || !profileData.name) {
+
+    // ---------------------------------------------------------
+    // PROFILE CHECK
+    // ---------------------------------------------------------
+
+    if (
+        !profileData ||
+        !profileData.name
+    ) {
 
         alert(
             "Please select or create a learning profile first."
         );
 
-        window.location.href = "profile.html";
+        window.location.href =
+            "profile.html";
+
         return;
     }
 
-    console.log("Selected profile:", profileData);
 
-    updateStudentName(profileData);
-    updateRoadmapHeader(profileData);
+    console.log(
+        "Selected profile:",
+        profileData
+    );
+
+
+    updateStudentName(
+        profileData
+    );
+
+
+    updateRoadmapHeader(
+        profileData
+    );
+
+
     showLoading();
 
 
-    // =====================================================
-    // EXISTING RECOMMENDATION FOR THIS PROFILE
-    // =====================================================
+    // ---------------------------------------------------------
+    // USE RECOMMENDATION STORED FOR THIS PROFILE
+    // ---------------------------------------------------------
 
     if (
         profileData.recommendation &&
-        typeof profileData.recommendation === "object"
+        typeof profileData.recommendation ===
+            "object"
     ) {
 
         console.log(
             "Using recommendation stored for this profile."
         );
 
+
         displayRoadmap(
             profileData,
             profileData.recommendation
         );
 
+
         return;
     }
 
 
-    // =====================================================
-    // CURRENT SESSION ROADMAP
-    // =====================================================
+    // ---------------------------------------------------------
+    // USE CURRENT SESSION ROADMAP
+    // ---------------------------------------------------------
 
     try {
 
@@ -83,10 +147,12 @@ async function loadRoadmap() {
                 "learnPathRoadmap"
             );
 
+
         const lastProfile =
             sessionStorage.getItem(
                 "lastProfile"
             );
+
 
         if (
             sessionRoadmap &&
@@ -98,16 +164,19 @@ async function loadRoadmap() {
                     lastProfile
                 );
 
+
             const roadmapData =
                 JSON.parse(
                     sessionRoadmap
                 );
+
 
             const sameProfile =
                 profileData.id &&
                 savedProfile.id &&
                 profileData.id ===
                     savedProfile.id;
+
 
             if (
                 sameProfile ||
@@ -118,14 +187,17 @@ async function loadRoadmap() {
                     "Using current-session roadmap."
                 );
 
+
                 displayRoadmap(
                     profileData,
                     roadmapData
                 );
 
+
                 return;
             }
         }
+
 
     } catch (error) {
 
@@ -136,15 +208,30 @@ async function loadRoadmap() {
     }
 
 
-    // =====================================================
+    // ---------------------------------------------------------
     // GENERATE NEW RECOMMENDATION
-    // =====================================================
+    // ---------------------------------------------------------
+
+    await generateRecommendation(
+        profileData
+    );
+}
+
+
+// =========================================================
+// GENERATE RECOMMENDATION
+// =========================================================
+
+async function generateRecommendation(
+    profileData
+) {
 
     try {
 
         console.log(
             "Sending selected profile to backend..."
         );
+
 
         const response =
             await fetch(
@@ -170,10 +257,12 @@ async function loadRoadmap() {
             let errorMessage =
                 `Backend error ${response.status}`;
 
+
             try {
 
                 const errorData =
                     await response.json();
+
 
                 if (
                     errorData &&
@@ -181,7 +270,8 @@ async function loadRoadmap() {
                 ) {
 
                     errorMessage =
-                        typeof errorData.detail === "object"
+                        typeof errorData.detail ===
+                        "object"
 
                             ? JSON.stringify(
                                 errorData.detail,
@@ -194,6 +284,7 @@ async function loadRoadmap() {
                             );
                 }
 
+
             } catch (error) {
 
                 console.error(
@@ -201,6 +292,7 @@ async function loadRoadmap() {
                     error
                 );
             }
+
 
             throw new Error(
                 errorMessage
@@ -214,7 +306,8 @@ async function loadRoadmap() {
 
         if (
             !recommendationData ||
-            typeof recommendationData !== "object"
+            typeof recommendationData !==
+                "object"
         ) {
 
             throw new Error(
@@ -229,12 +322,16 @@ async function loadRoadmap() {
         );
 
 
-        const totalRoadmapCourses =
+        const learningPath =
             Array.isArray(
                 recommendationData.learning_path
             )
-                ? recommendationData.learning_path.length
-                : 0;
+                ? recommendationData.learning_path
+                : [];
+
+
+        const totalRoadmapCourses =
+            learningPath.length;
 
 
         const updatedProfile =
@@ -243,29 +340,32 @@ async function loadRoadmap() {
                 recommendation:
                     recommendationData,
 
-                recommendationUpdatedAt:
-                    new Date().toISOString(),
-
                 totalRoadmapCourses:
-                    totalRoadmapCourses
+                    totalRoadmapCourses,
+
+                recommendationUpdatedAt:
+                    new Date().toISOString()
 
             });
 
 
         const profileForDisplay =
-            updatedProfile
-                ? updatedProfile
-                : {
-                    ...profileData,
-                    recommendation:
-                        recommendationData,
+            updatedProfile ||
+            {
+                ...profileData,
 
-                    totalRoadmapCourses:
-                        totalRoadmapCourses
-                };
+                recommendation:
+                    recommendationData,
+
+                totalRoadmapCourses:
+                    totalRoadmapCourses
+            };
 
 
-        // Backward compatibility
+        // -----------------------------------------------------
+        // BACKWARD COMPATIBILITY
+        // -----------------------------------------------------
+
         localStorage.setItem(
             "recommendation",
             JSON.stringify(
@@ -290,6 +390,14 @@ async function loadRoadmap() {
         );
 
 
+        sessionStorage.setItem(
+            "learnPathProfile",
+            JSON.stringify(
+                profileForDisplay
+            )
+        );
+
+
         displayRoadmap(
             profileForDisplay,
             recommendationData
@@ -302,6 +410,7 @@ async function loadRoadmap() {
             "ROADMAP GENERATION ERROR:",
             error
         );
+
 
         showBackendError(
             error
@@ -322,6 +431,7 @@ function getSelectedProfile() {
             localStorage.getItem(
                 "learnPathProfiles"
             );
+
 
         const selectedId =
             localStorage.getItem(
@@ -362,7 +472,10 @@ function getSelectedProfile() {
         }
 
 
-        // Backward compatibility
+        // -----------------------------------------------------
+        // BACKWARD COMPATIBILITY
+        // -----------------------------------------------------
+
         const oldProfile =
             localStorage.getItem(
                 "learnPathProfile"
@@ -405,6 +518,7 @@ function updateSelectedProfile(
                 "learnPathProfiles"
             );
 
+
         const selectedId =
             localStorage.getItem(
                 "selectedProfileId"
@@ -419,6 +533,7 @@ function updateSelectedProfile(
             console.warn(
                 "No selected multi-profile found."
             );
+
 
             return null;
         }
@@ -448,15 +563,20 @@ function updateSelectedProfile(
             );
 
 
-        if (index === -1) {
+        if (
+            index === -1
+        ) {
 
             return null;
         }
 
 
         profiles[index] = {
+
             ...profiles[index],
+
             ...updates
+
         };
 
 
@@ -468,7 +588,10 @@ function updateSelectedProfile(
         );
 
 
-        // Backward compatibility
+        // -----------------------------------------------------
+        // BACKWARD COMPATIBILITY
+        // -----------------------------------------------------
+
         localStorage.setItem(
             "learnPathProfile",
             JSON.stringify(
@@ -499,6 +622,7 @@ function updateSelectedProfile(
             "Could not update selected profile:",
             error
         );
+
 
         return null;
     }
@@ -545,7 +669,10 @@ function displayRoadmap(
         "Learning";
 
 
-    // Save total roadmap size
+    // ---------------------------------------------------------
+    // MAKE SURE ROADMAP TOTAL IS STORED
+    // ---------------------------------------------------------
+
     if (
         !profileData.totalRoadmapCourses &&
         learningPath.length > 0
@@ -589,7 +716,8 @@ function displayRoadmap(
 
 
     renderRoadmapCourses(
-        learningPath
+        learningPath,
+        profileData
     );
 
 
@@ -604,11 +732,6 @@ function displayRoadmap(
 
     console.log(
         "PERSONALIZED ROADMAP READY"
-    );
-
-    console.log(
-        "Profile:",
-        profileData
     );
 
     console.log(
@@ -666,7 +789,8 @@ function getBackendSkills(
 
     if (
         recommendationData.skill_mastery &&
-        typeof recommendationData.skill_mastery === "object"
+        typeof recommendationData.skill_mastery ===
+            "object"
     ) {
 
         const skills =
@@ -709,6 +833,7 @@ function getCurrentSkills(
 ) {
 
     if (!profile) {
+
         return [];
     }
 
@@ -760,7 +885,8 @@ function getCurrentSkills(
 
 
         if (
-            typeof value === "string"
+            typeof value ===
+            "string"
         ) {
 
             return uniqueSkills(
@@ -781,7 +907,7 @@ function getCurrentSkills(
 
 
 // =========================================================
-// EXTRACT SKILL
+// EXTRACT SKILL NAME
 // =========================================================
 
 function extractSkillName(
@@ -789,7 +915,8 @@ function extractSkillName(
 ) {
 
     if (
-        typeof skill === "string"
+        typeof skill ===
+        "string"
     ) {
 
         return skill.trim();
@@ -798,15 +925,22 @@ function extractSkillName(
 
     if (
         skill &&
-        typeof skill === "object"
+        typeof skill ===
+            "object"
     ) {
 
         return (
+
             skill.name ||
+
             skill.skill ||
+
             skill.title ||
+
             skill.label ||
+
             ""
+
         );
     }
 
@@ -826,6 +960,29 @@ function updateSummaryCards(
     learningPath
 ) {
 
+    // -----------------------------------------------------
+    // REMOVE DUPLICATE GAPS THAT ARE ALREADY SKILLS
+    // -----------------------------------------------------
+
+    const remainingGaps =
+        uniqueSkills(
+            skillGaps
+        ).filter(
+            gap => {
+
+                return !userSkills.some(
+                    skill =>
+                        normalizeText(
+                            skill
+                        ) ===
+                        normalizeText(
+                            gap
+                        )
+                );
+            }
+        );
+
+
     setText(
         "skillsHave",
         userSkills.length
@@ -834,9 +991,7 @@ function updateSummaryCards(
 
     setText(
         "skillsToLearn",
-        uniqueSkills(
-            skillGaps
-        ).length
+        remainingGaps.length
     );
 
 
@@ -846,6 +1001,10 @@ function updateSummaryCards(
     );
 
 
+    // -----------------------------------------------------
+    // GOAL READINESS
+    // -----------------------------------------------------
+
     let readiness =
         Number(
             recommendationData
@@ -853,6 +1012,7 @@ function updateSummaryCards(
         );
 
 
+    // Fallback calculation
     if (
         !Number.isFinite(
             readiness
@@ -861,7 +1021,7 @@ function updateSummaryCards(
 
         const total =
             userSkills.length +
-            skillGaps.length;
+            remainingGaps.length;
 
 
         readiness =
@@ -909,12 +1069,18 @@ function renderSkillMap(
 
 
     if (!skillTags) {
+
         return;
     }
 
 
-    skillTags.innerHTML = "";
+    skillTags.innerHTML =
+        "";
 
+
+    // -----------------------------------------------------
+    // ACHIEVED SKILLS
+    // -----------------------------------------------------
 
     uniqueSkills(
         userSkills
@@ -942,10 +1108,34 @@ function renderSkillMap(
     );
 
 
+    // -----------------------------------------------------
+    // REMAINING SKILLS
+    // -----------------------------------------------------
+
     uniqueSkills(
         skillGaps
     ).forEach(
         skill => {
+
+            const alreadyHave =
+                userSkills.some(
+                    existing =>
+                        normalizeText(
+                            existing
+                        ) ===
+                        normalizeText(
+                            skill
+                        )
+                );
+
+
+            if (
+                alreadyHave
+            ) {
+
+                return;
+            }
+
 
             const tag =
                 document.createElement(
@@ -999,7 +1189,8 @@ function renderSkillMap(
 // =========================================================
 
 function renderRoadmapCourses(
-    learningPath
+    learningPath,
+    profileData
 ) {
 
     const container =
@@ -1009,11 +1200,13 @@ function renderRoadmapCourses(
 
 
     if (!container) {
+
         return;
     }
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     if (
@@ -1040,6 +1233,14 @@ function renderRoadmapCourses(
 
         return;
     }
+
+
+    const completed =
+        Array.isArray(
+            profileData.completed
+        )
+            ? profileData.completed
+            : [];
 
 
     learningPath.forEach(
@@ -1073,6 +1274,44 @@ function renderRoadmapCourses(
             const predictedSuccess =
                 getPredictedSuccess(
                     course
+                );
+
+
+            const courseName =
+                course.title ||
+                `Course ${index + 1}`;
+
+
+            const isCompleted =
+                completed.some(
+                    item => {
+
+                        const itemName =
+                            typeof item ===
+                                "string"
+
+                                ? item
+
+                                : (
+                                    item &&
+                                    (
+                                        item.title ||
+                                        item.name ||
+                                        item.course ||
+                                        ""
+                                    )
+                                );
+
+
+                        return (
+                            normalizeText(
+                                itemName
+                            ) ===
+                            normalizeText(
+                                courseName
+                            )
+                        );
+                    }
                 );
 
 
@@ -1112,8 +1351,7 @@ function renderRoadmapCourses(
                     <h3>
 
                         ${escapeHTML(
-                            course.title ||
-                            "Recommended Course"
+                            courseName
                         )}
 
                     </h3>
@@ -1245,7 +1483,9 @@ function renderRoadmapCourses(
 
                         ${
                             predictedSuccess !== null
+
                                 ? `
+
                                     <p>
 
                                         <strong>
@@ -1255,7 +1495,9 @@ function renderRoadmapCourses(
                                         ${predictedSuccess}%
 
                                     </p>
+
                                 `
+
                                 : ""
                         }
 
@@ -1264,35 +1506,65 @@ function renderRoadmapCourses(
 
                     <div class="course-project">
 
-                        🏆 Complete
+                        ${
+                            isCompleted
+                                ? "✅ Completed"
+                                : "🏆 Complete"
+                        }
 
                         ${escapeHTML(
-                            course.title ||
-                            "this course"
+                            courseName
                         )}
 
-                        and finish the project
+                        ${
+                            isCompleted
+                                ? ""
+                                : " and finish the project"
+                        }
 
                     </div>
 
 
                     <div class="course-buttons">
 
-                        <button
-                            onclick="
-                                completeCourse(${index})
-                            "
-                        >
-                            Mark Complete
-                        </button>
+                        ${
+                            isCompleted
+
+                                ? `
+
+                                    <button
+                                        disabled
+                                        style="
+                                            opacity:0.6;
+                                            cursor:not-allowed;
+                                        "
+                                    >
+                                        ✓ Completed
+                                    </button>
+
+                                `
+
+                                : `
+
+                                    <button
+                                        onclick="
+                                            completeCourse(
+                                                ${index}
+                                            )
+                                        "
+                                    >
+                                        Mark Complete
+                                    </button>
+
+                                `
+                        }
 
 
                         <button
                             onclick="
                                 giveFeedback(
                                     '${escapeJS(
-                                        course.title ||
-                                        "Course"
+                                        courseName
                                     )}'
                                 )
                             "
@@ -1330,11 +1602,13 @@ function renderTopRecommendations(
 
 
     if (!container) {
+
         return;
     }
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     if (
@@ -1461,7 +1735,9 @@ function renderTopRecommendations(
 
                 ${
                     predictedSuccess !== null
+
                         ? `
+
                             <p>
 
                                 <strong>
@@ -1471,7 +1747,9 @@ function renderTopRecommendations(
                                 ${predictedSuccess}%
 
                             </p>
+
                         `
+
                         : ""
                 }
 
@@ -1517,7 +1795,8 @@ function getCourseSkills(
 
 
     if (
-        typeof course.skills === "string"
+        typeof course.skills ===
+        "string"
     ) {
 
         return course.skills;
@@ -1549,8 +1828,10 @@ function getMasteryValues(
     let before =
         course.current_mastery;
 
+
     let after =
         course.expected_mastery;
+
 
     let gain =
         course.mastery_gain;
@@ -1587,13 +1868,21 @@ function getMasteryValues(
 
 
     before =
-        Number(before);
+        Number(
+            before
+        );
+
 
     after =
-        Number(after);
+        Number(
+            after
+        );
+
 
     gain =
-        Number(gain);
+        Number(
+            gain
+        );
 
 
     if (
@@ -1629,9 +1918,13 @@ function getMasteryValues(
 
 
     return {
+
         before,
+
         gain,
+
         after
+
     };
 }
 
@@ -1665,14 +1958,17 @@ function getPredictedSuccess(
 
 
 // =========================================================
-// COMPLETE COURSE
+// COMPLETE COURSE + ACHIEVE SKILL
 // =========================================================
 
-function completeCourse(
+async function completeCourse(
     index
 ) {
 
-    // Get the currently selected profile
+    // ---------------------------------------------------------
+    // GET SELECTED PROFILE
+    // ---------------------------------------------------------
+
     const profile =
         getSelectedProfile();
 
@@ -1687,14 +1983,18 @@ function completeCourse(
     }
 
 
-    // Get this profile's recommendation
+    // ---------------------------------------------------------
+    // GET RECOMMENDATION
+    // ---------------------------------------------------------
+
     const recommendation =
         profile.recommendation;
 
 
     if (
         !recommendation ||
-        typeof recommendation !== "object"
+        typeof recommendation !==
+            "object"
     ) {
 
         alert(
@@ -1704,6 +2004,10 @@ function completeCourse(
         return;
     }
 
+
+    // ---------------------------------------------------------
+    // GET LEARNING PATH
+    // ---------------------------------------------------------
 
     const learningPath =
         Array.isArray(
@@ -1732,7 +2036,104 @@ function completeCourse(
         `Course ${index + 1}`;
 
 
-    // Get existing completed courses
+    // ---------------------------------------------------------
+    // GET COURSE SKILLS
+    // ---------------------------------------------------------
+
+    let courseSkills = [];
+
+
+    if (
+        Array.isArray(
+            course.skills
+        )
+    ) {
+
+        courseSkills =
+            course.skills
+                .map(
+                    skill =>
+                        extractSkillName(
+                            skill
+                        )
+                )
+                .filter(Boolean);
+
+    } else if (
+        typeof course.skills ===
+        "string"
+    ) {
+
+        courseSkills =
+            course.skills
+                .split(",")
+                .map(
+                    skill =>
+                        skill.trim()
+                )
+                .filter(Boolean);
+
+    } else if (
+        course.skill
+    ) {
+
+        courseSkills = [
+            String(
+                course.skill
+            ).trim()
+        ];
+    }
+
+
+    // ---------------------------------------------------------
+    // CURRENT SKILLS
+    // ---------------------------------------------------------
+
+    const currentSkills =
+        Array.isArray(
+            profile.skills
+        )
+            ? [
+                ...profile.skills
+            ]
+            : [];
+
+
+    // ---------------------------------------------------------
+    // ADD ACHIEVED SKILLS
+    // ---------------------------------------------------------
+
+    for (
+        const skill of courseSkills
+    ) {
+
+        const alreadyHasSkill =
+            currentSkills.some(
+                existing =>
+                    normalizeText(
+                        existing
+                    ) ===
+                    normalizeText(
+                        skill
+                    )
+            );
+
+
+        if (
+            !alreadyHasSkill
+        ) {
+
+            currentSkills.push(
+                skill
+            );
+        }
+    }
+
+
+    // ---------------------------------------------------------
+    // COMPLETED COURSES
+    // ---------------------------------------------------------
+
     const completed =
         Array.isArray(
             profile.completed
@@ -1743,14 +2144,15 @@ function completeCourse(
             : [];
 
 
-    // Avoid duplicate completion
     const alreadyCompleted =
         completed.some(
             item => {
 
                 const existingName =
                     typeof item === "string"
+
                         ? item
+
                         : (
                             item &&
                             (
@@ -1774,23 +2176,27 @@ function completeCourse(
         );
 
 
-    if (alreadyCompleted) {
+    if (
+        alreadyCompleted
+    ) {
 
         alert(
-            "This course is already marked as completed."
+            "This course is already completed."
         );
 
         return;
     }
 
 
-    // Add course
     completed.push(
         courseName
     );
 
 
-    // Keep total roadmap size fixed
+    // ---------------------------------------------------------
+    // TOTAL ROADMAP COURSES
+    // ---------------------------------------------------------
+
     const totalRoadmapCourses =
         Number(
             profile.totalRoadmapCourses
@@ -1803,17 +2209,27 @@ function completeCourse(
             : learningPath.length;
 
 
-    // IMPORTANT:
-    // Update the selected multi-profile
+    // ---------------------------------------------------------
+    // SAVE UPDATED PROFILE
+    // ---------------------------------------------------------
+
     const updatedProfile =
         updateSelectedProfile({
 
-            completed,
+            skills:
+                currentSkills,
 
-            totalRoadmapCourses,
+            completed:
+                completed,
+
+            totalRoadmapCourses:
+                totalRoadmapCourses,
 
             lastCompletedCourse:
                 courseName,
+
+            lastCompletedSkills:
+                courseSkills,
 
             lastCompletedAt:
                 new Date().toISOString()
@@ -1824,14 +2240,17 @@ function completeCourse(
     if (!updatedProfile) {
 
         alert(
-            "Unable to update the selected learning profile."
+            "Unable to update the selected profile."
         );
 
         return;
     }
 
 
-    // Backward compatibility
+    // ---------------------------------------------------------
+    // LEGACY STORAGE
+    // ---------------------------------------------------------
+
     localStorage.setItem(
         "completedCourses",
         JSON.stringify(
@@ -1840,16 +2259,6 @@ function completeCourse(
     );
 
 
-    localStorage.setItem(
-        "recommendation",
-        JSON.stringify(
-            updatedProfile.recommendation ||
-            recommendation
-        )
-    );
-
-
-    // Keep session storage synchronized
     sessionStorage.setItem(
         "learnPathProfile",
         JSON.stringify(
@@ -1866,41 +2275,211 @@ function completeCourse(
     );
 
 
-    const progress =
-        totalRoadmapCourses > 0
-            ? Math.round(
-                (
-                    completed.length /
-                    totalRoadmapCourses
-                ) * 100
-            )
-            : 0;
-
+    console.log(
+        "================================"
+    );
 
     console.log(
-        "Course completed:",
+        "SKILL ACHIEVEMENT"
+    );
+
+    console.log(
+        "Completed Course:",
         courseName
     );
 
     console.log(
-        "Completed courses:",
-        completed.length
+        "Achieved Skills:",
+        courseSkills
     );
 
     console.log(
-        "Total roadmap courses:",
-        totalRoadmapCourses
+        "Updated Skills:",
+        currentSkills
     );
 
     console.log(
-        "Course progress:",
-        `${progress}%`
+        "================================"
     );
 
 
-    alert(
-        "Course marked as completed! 🎉"
-    );
+    // ---------------------------------------------------------
+    // SHOW LOADING
+    // ---------------------------------------------------------
+
+    showLoading();
+
+
+    // ---------------------------------------------------------
+    // REGENERATE ROADMAP
+    // ---------------------------------------------------------
+
+    try {
+
+        const response =
+            await fetch(
+                `${BACKEND_URL}/recommend`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            updatedProfile
+                        )
+                }
+            );
+
+
+        if (
+            !response.ok
+        ) {
+
+            const errorText =
+                await response.text();
+
+
+            throw new Error(
+                `Backend returned ${response.status}: ${errorText}`
+            );
+        }
+
+
+        const newRecommendation =
+            await response.json();
+
+
+        // -----------------------------------------------------
+        // SAVE NEW RECOMMENDATION
+        // -----------------------------------------------------
+
+        const finalProfile =
+            updateSelectedProfile({
+
+                skills:
+                    currentSkills,
+
+                completed:
+                    completed,
+
+                recommendation:
+                    newRecommendation,
+
+                totalRoadmapCourses:
+                    totalRoadmapCourses,
+
+                recommendationUpdatedAt:
+                    new Date().toISOString()
+
+            });
+
+
+        const profileToUse =
+            finalProfile ||
+            {
+                ...updatedProfile,
+
+                skills:
+                    currentSkills,
+
+                completed:
+                    completed,
+
+                recommendation:
+                    newRecommendation,
+
+                totalRoadmapCourses:
+                    totalRoadmapCourses
+            };
+
+
+        localStorage.setItem(
+            "recommendation",
+            JSON.stringify(
+                newRecommendation
+            )
+        );
+
+
+        sessionStorage.setItem(
+            "learnPathRoadmap",
+            JSON.stringify(
+                newRecommendation
+            )
+        );
+
+
+        sessionStorage.setItem(
+            "learnPathProfile",
+            JSON.stringify(
+                profileToUse
+            )
+        );
+
+
+        sessionStorage.setItem(
+            "lastProfile",
+            JSON.stringify(
+                profileToUse
+            )
+        );
+
+
+        // -----------------------------------------------------
+        // SHOW UPDATED ROADMAP
+        // -----------------------------------------------------
+
+        displayRoadmap(
+            profileToUse,
+            newRecommendation
+        );
+
+
+        // -----------------------------------------------------
+        // SUCCESS
+        // -----------------------------------------------------
+
+        const skillText =
+            courseSkills.length > 0
+
+                ? courseSkills.join(
+                    ", "
+                )
+
+                : "the course skill";
+
+
+        alert(
+            `Great! ${skillText} ` +
+            `has been added to your achieved skills. 🎉`
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Could not regenerate roadmap:",
+            error
+        );
+
+
+        // Keep the skill/course completion saved
+        displayRoadmap(
+            updatedProfile,
+            recommendation
+        );
+
+
+        alert(
+            "The course was marked as completed, " +
+            "but the roadmap could not be refreshed.\n\n" +
+            error.message
+        );
+    }
 }
 
 
@@ -2057,14 +2636,13 @@ function showLoading() {
             <div class="course-card">
 
                 <h3>
-                    🤖 Generating your
+                    🤖 Updating your
                     personalized learning path...
                 </h3>
 
                 <p>
-                    The AI recommendation engine
-                    is analyzing your skills,
-                    experience and learning goals.
+                    Your newly achieved skill is
+                    being added to your learning profile.
                 </p>
 
             </div>
@@ -2105,7 +2683,8 @@ function showLoading() {
 
     if (skillTags) {
 
-        skillTags.innerHTML = "";
+        skillTags.innerHTML =
+            "";
     }
 }
 
@@ -2126,8 +2705,12 @@ function showBackendError(
 
     const message =
         error instanceof Error
+
             ? error.message
-            : String(error);
+
+            : String(
+                error
+            );
 
 
     console.error(
@@ -2147,10 +2730,13 @@ function showBackendError(
                 </h3>
 
                 <p>
+
                     <strong>
                         Error:
                     </strong>
+
                 </p>
+
 
                 <pre
                     style="
@@ -2161,6 +2747,7 @@ function showBackendError(
                 >${escapeHTML(
                     message
                 )}</pre>
+
 
                 <p>
                     Make sure your FastAPI
@@ -2233,6 +2820,7 @@ function uniqueSkills(
     const seen =
         new Set();
 
+
     const result =
         [];
 
@@ -2263,6 +2851,7 @@ function uniqueSkills(
             seen.add(
                 key
             );
+
 
             result.push(
                 value
