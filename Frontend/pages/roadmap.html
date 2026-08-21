@@ -1,92 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>LearnPath AI - Roadmap</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/roadmap.css">
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/roadmap.css"
+    >
+
 </head>
+
 <body>
 
 <div class="app-container">
+
     <!-- SIDEBAR -->
+
     <aside class="sidebar">
-        <div class="logo">🧠 LearnPath <span>AI</span></div>
-        <nav class="side-nav">
-            <a href="profile.html">My Learning</a>
-            <a href="roadmap.html" class="active">Roadmaps</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="assistant.html">AI Assistant</a>
-        </nav>
-    </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-        <header class="top-bar" style="justify-content: flex-end;">
-            <div class="user-profile">
-                <div class="user-info">
-                    <strong id="topNavName">Student</strong>
-                    <span>Student</span>
-                </div>
-            </div>
-        </header>
-
-        <div class="roadmap-header">
-            <h1>Your Learning Journey</h1>
-            <p id="roadmapSubtitle">Estimated timeline based on your profile</p>
+        <div class="logo">
+            🧠 LearnPath <span>AI</span>
         </div>
 
+        <nav class="side-nav">
+
+            <a href="profile.html">
+                My Learning
+            </a>
+
+            <a
+                href="roadmap.html"
+                class="active"
+            >
+                Roadmaps
+            </a>
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="assistant.html">
+                AI Assistant
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <header
+            class="top-bar"
+            style="justify-content: flex-end;"
+        >
+
+            <div class="user-profile">
+
+                <div class="user-info">
+
+                    <strong id="topNavName">
+                        Student
+                    </strong>
+
+                    <span>
+                        Student
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- HEADER -->
+
+        <div class="roadmap-header">
+
+            <h1 id="roadmapTitle">
+                Your Learning Journey
+            </h1>
+
+            <p id="roadmapSubtitle">
+                Estimated timeline based on your profile
+            </p>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
         <section class="summary-grid">
+
             <div class="summary-card">
-                <p>Goal Readiness</p>
-                <strong>40%</strong>
+
+                <p>
+                    Goal Readiness
+                </p>
+
+                <strong id="readinessPercentage">
+                    0%
+                </strong>
+
             </div>
+
+
             <div class="summary-card">
-                <p>Skills You Have</p>
-                <strong>2</strong>
+
+                <p>
+                    Skills You Have
+                </p>
+
+                <strong id="skillsHave">
+                    0
+                </strong>
+
             </div>
+
+
             <div class="summary-card">
-                <p>Skills To Learn</p>
-                <strong>3</strong>
+
+                <p>
+                    Skills To Learn
+                </p>
+
+                <strong id="skillsToLearn">
+                    0
+                </strong>
+
             </div>
+
+
             <div class="summary-card">
-                <p>Recommended Steps</p>
-                <strong>10</strong>
+
+                <p>
+                    Recommended Steps
+                </p>
+
+                <strong id="recommendedSteps">
+                    0
+                </strong>
+
             </div>
+
         </section>
+
+
+        <!-- SKILL GAP -->
 
         <section class="skill-gap">
-            <h2>Skill Map</h2>
-            <div class="skill-tags">
-                <span class="skill-have">✓ Python</span>
-                <span class="skill-have">✓ NLP</span>
-                <span class="skill-needed">→ Machine Learning</span>
-                <span class="skill-needed">→ Deep Learning</span>
-                <span class="skill-needed">→ Transformers</span>
-            </div>
+
+            <h2>
+                Skill Map
+            </h2>
+
+            <div
+                class="skill-tags"
+                id="skillTags"
+            ></div>
+
         </section>
 
-        <!-- Dynamic JS Container -->
-        <section id="roadmapContainer"></section>
+
+        <!-- ROADMAP -->
+
+        <section
+            id="roadmapContainer"
+        ></section>
+
+
+        <!-- RECOMMENDATIONS -->
 
         <section class="recommendations">
-            <h2>Top AI Recommendations</h2>
-            <div class="recommendation-grid" id="recommendationContainer"></div>
+
+            <h2>
+                Top AI Recommendations
+            </h2>
+
+            <div
+                class="recommendation-grid"
+                id="recommendationContainer"
+            ></div>
+
         </section>
+
     </main>
+
 </div>
 
+
 <script src="../js/roadmap.js"></script>
-<!-- Session Storage Script -->
-<script>
-    const savedProfile = JSON.parse(sessionStorage.getItem("learnPathProfile"));
-    if (savedProfile && savedProfile.name) {
-        const topName = document.getElementById("topNavName");
-        if (topName) {
-            topName.textContent = savedProfile.name.split(" ")[0]; 
-        }
-    }
-</script>
+
 </body>
+
 </html>

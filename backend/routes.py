@@ -38,7 +38,6 @@ ML_SERVICE_URL = (
 def health_check():
 
     return {
-
         "status":
             "ok",
 
@@ -58,7 +57,6 @@ def extract_study_hours(
     try:
 
         if study_time is None:
-
             return 5.0
 
 
@@ -111,7 +109,6 @@ def normalize_skills(
 
 
     return {
-
         str(skill)
         .strip()
         .lower()
@@ -119,7 +116,6 @@ def normalize_skills(
         for skill in skill_list
 
         if str(skill).strip()
-
     }
 
 
@@ -170,7 +166,6 @@ def prepare_ml_data(
         )
 
         else 0
-
     )
 
 
@@ -193,7 +188,6 @@ def prepare_ml_data(
         )
 
         else 0
-
     )
 
 
@@ -218,7 +212,6 @@ def prepare_ml_data(
         )
 
         else 0
-
     )
 
 
@@ -243,7 +236,6 @@ def prepare_ml_data(
         )
 
         else 0
-
     )
 
 
@@ -259,15 +251,15 @@ def prepare_ml_data(
 
             s == "nlp"
             or
-            "natural language processing"
-            in s
+            "natural language processing" in s
+            or
+            "natural language" in s
 
             for s in skills
 
         )
 
         else 0
-
     )
 
 
@@ -288,7 +280,6 @@ def prepare_ml_data(
         )
 
         else 0
-
     )
 
 
@@ -331,7 +322,6 @@ def prepare_ml_data(
         if skill_scores
 
         else 50.0
-
     )
 
 
@@ -374,6 +364,9 @@ def prepare_ml_data(
             ValueError
         ):
 
+            # Course names such as
+            # "Python Basics" are kept separately
+            # in _completed_names.
             pass
 
 
@@ -464,6 +457,10 @@ def recommend(
         )
 
 
+        # -------------------------------------------------
+        # DEBUG LOG
+        # -------------------------------------------------
+
         print(
             "\n================================"
         )
@@ -479,6 +476,11 @@ def recommend(
         print(
             "Learner:",
             profile.name
+        )
+
+        print(
+            "Email:",
+            profile.email
         )
 
         print(
@@ -507,8 +509,22 @@ def recommend(
         )
 
         print(
+            "Learning Style:",
+            profile.learning_style
+        )
+
+        print(
             "Study Time:",
             profile.study_time
+        )
+
+        print(
+            "Target Months:",
+            profile.target_months
+        )
+
+        print(
+            "================================"
         )
 
 
@@ -524,7 +540,6 @@ def recommend(
             json=ml_data,
 
             timeout=30
-
         )
 
 
@@ -896,9 +911,11 @@ def recommend(
             readiness = round(
 
                 (
+
                     current_skills
                     /
                     total_skill_count
+
                 )
 
                 * 100
@@ -911,8 +928,11 @@ def recommend(
             0,
 
             min(
+
                 100,
+
                 readiness
+
             )
 
         )
@@ -1015,7 +1035,6 @@ def recommend(
             detail=(
 
                 "ML service is not running. "
-
                 "Please start the ML service "
                 "on port 8001."
 
@@ -1035,7 +1054,9 @@ def recommend(
             status_code=504,
 
             detail=(
+
                 "ML service request timed out."
+
             )
 
         )
@@ -1057,8 +1078,11 @@ def recommend(
     except Exception as error:
 
         print(
+
             "\nRecommendation Error:",
+
             error
+
         )
 
 
@@ -1069,6 +1093,7 @@ def recommend(
             detail=str(error)
 
         )
+
 
 # =========================================================
 # AI CHAT ASSISTANT
@@ -1096,15 +1121,18 @@ def chat(
             "================================"
         )
 
+
         print(
             "Student:",
             request.profile.name
         )
 
+
         print(
             "Goal:",
             request.profile.goal
         )
+
 
         print(
             "Question:",
@@ -1117,10 +1145,19 @@ def chat(
         # -------------------------------------------------
 
         answer = ask_groq(
-            question=request.question,
-            profile=request.profile,
-            roadmap=request.roadmap,
-            history=request.history
+
+            question=
+                request.question,
+
+            profile=
+                request.profile,
+
+            roadmap=
+                request.roadmap,
+
+            history=
+                request.history
+
         )
 
 
@@ -1134,7 +1171,9 @@ def chat(
 
 
         return ChatResponse(
+
             answer=answer
+
         )
 
 
@@ -1162,11 +1201,15 @@ def chat(
 
 
         raise HTTPException(
+
             status_code=500,
+
             detail=(
+
                 "The AI Assistant could not "
                 "generate a response. "
                 "Please try again."
-            )
-        )
 
+            )
+
+        )

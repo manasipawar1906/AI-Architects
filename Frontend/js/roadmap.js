@@ -1,11 +1,5 @@
-/* =========================================================
-   LEARNPATH AI - ROADMAP
-   ML CONNECTED VERSION
-   ========================================================= */
-
-
 // =========================================================
-// BACKEND
+// LEARNPATH AI - DYNAMIC ROADMAP
 // =========================================================
 
 const BACKEND_URL =
@@ -29,16 +23,15 @@ document.addEventListener(
 async function loadRoadmap() {
 
     console.log(
-        "Loading ML-powered roadmap..."
+        "Loading personalized LearnPath AI roadmap..."
     );
 
-
-    // -----------------------------------------------------
-    // GET PROFILE
-    // -----------------------------------------------------
-
     let profileData = {};
+    let recommendationData = null;
 
+    // -----------------------------------------------------
+    // READ PROFILE
+    // -----------------------------------------------------
 
     try {
 
@@ -49,16 +42,14 @@ async function loadRoadmap() {
                 )
             ) || {};
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
-            "Unable to read saved profile:",
+            "Profile data error:",
             error
         );
 
-        showBackendError(
+        showError(
             "Saved profile data is invalid."
         );
 
@@ -67,18 +58,17 @@ async function loadRoadmap() {
 
 
     console.log(
-        "Profile:",
+        "CURRENT PROFILE:",
         profileData
     );
 
 
     // -----------------------------------------------------
-    // CHECK PROFILE
+    // PROFILE CHECK
     // -----------------------------------------------------
 
     if (
-        !profileData
-        ||
+        !profileData ||
         !profileData.name
     ) {
 
@@ -86,18 +76,12 @@ async function loadRoadmap() {
             "Please complete your profile first."
         );
 
-
         window.location.href =
             "profile.html";
-
 
         return;
     }
 
-
-    // -----------------------------------------------------
-    // UPDATE NAME
-    // -----------------------------------------------------
 
     updateStudentName(
         profileData
@@ -105,266 +89,167 @@ async function loadRoadmap() {
 
 
     // -----------------------------------------------------
-    // LOADING
-    // -----------------------------------------------------
-
-    showLoading();
-
-
-    // -----------------------------------------------------
-    // REMOVE OLD RECOMMENDATION
-    // -----------------------------------------------------
-
-    localStorage.removeItem(
-        "recommendation"
-    );
-
-
-    // -----------------------------------------------------
-    // CALL BACKEND
+    // USE FRESHLY GENERATED ROADMAP
     // -----------------------------------------------------
 
     try {
 
-        console.log(
-            "Sending profile to backend..."
-        );
-
-
-        console.log(
-            "Backend URL:",
-            `${BACKEND_URL}/recommend`
-        );
-
-
-        console.log(
-            "Request data:",
-            profileData
-        );
-
-
-        const response =
-            await fetch(
-
-                `${BACKEND_URL}/recommend`,
-
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify(
-                            profileData
-                        )
-
-                }
-
+        const savedRoadmap =
+            sessionStorage.getItem(
+                "learnPathRoadmap"
             );
 
+        if (savedRoadmap) {
 
-        console.log(
-            "Backend status:",
-            response.status
-        );
-
-
-        // -------------------------------------------------
-        // HANDLE ERROR
-        // -------------------------------------------------
-
-        if (!response.ok) {
-
-            let errorMessage =
-                `Backend error ${response.status}`;
-
-
-            try {
-
-                const errorData =
-                    await response.json();
-
-
-                console.error(
-                    "BACKEND ERROR:",
-                    errorData
+            recommendationData =
+                JSON.parse(
+                    savedRoadmap
                 );
 
+            console.log(
+                "Using roadmap generated for CURRENT profile."
+            );
+        }
 
-                if (
-                    errorData
-                    &&
-                    errorData.detail
-                ) {
+    } catch (error) {
 
-                    if (
-                        typeof
-                        errorData.detail
-                        ===
-                        "object"
-                    ) {
+        console.warn(
+            "Could not read saved roadmap:",
+            error
+        );
 
-                        errorMessage =
+        sessionStorage.removeItem(
+            "learnPathRoadmap"
+        );
+    }
+
+
+    // -----------------------------------------------------
+    // FALLBACK API REQUEST
+    // -----------------------------------------------------
+
+    if (!recommendationData) {
+
+        showLoading();
+
+        try {
+
+            console.log(
+                "No saved roadmap found."
+            );
+
+            console.log(
+                "Sending CURRENT profile to backend:",
+                profileData
+            );
+
+            const response =
+                await fetch(
+                    `${BACKEND_URL}/recommend`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
                             JSON.stringify(
-                                errorData.detail,
-                                null,
-                                2
-                            );
-
+                                profileData
+                            )
                     }
-
-                    else {
-
-                        errorMessage =
-                            String(
-                                errorData.detail
-                            );
-
-                    }
-
-                }
-
-                else {
-
-                    errorMessage =
-                        JSON.stringify(
-                            errorData,
-                            null,
-                            2
-                        );
-
-                }
-
-            }
-
-            catch (parseError) {
-
-                console.error(
-                    "Could not parse backend error:",
-                    parseError
                 );
 
 
-                errorMessage =
-                    `Backend returned HTTP ${response.status}`;
+            if (!response.ok) {
 
+                let message =
+                    `Backend returned ${response.status}`;
+
+                try {
+
+                    const data =
+                        await response.json();
+
+                    if (data?.detail) {
+
+                        message =
+                            typeof data.detail === "string"
+                                ? data.detail
+                                : JSON.stringify(
+                                    data.detail,
+                                    null,
+                                    2
+                                );
+                    }
+
+                } catch (error) {
+                    console.error(
+                        error
+                    );
+                }
+
+                throw new Error(
+                    message
+                );
             }
 
 
-            throw new Error(
-                errorMessage
-            );
-        }
+            recommendationData =
+                await response.json();
 
 
-        // -------------------------------------------------
-        // READ RESPONSE
-        // -------------------------------------------------
-
-        const recommendationData =
-            await response.json();
-
-
-        console.log(
-            "================================"
-        );
-
-
-        console.log(
-            "ML RECOMMENDATION RECEIVED"
-        );
-
-
-        console.log(
-            recommendationData
-        );
-
-
-        console.log(
-            "================================"
-        );
-
-
-        // -------------------------------------------------
-        // VALIDATE
-        // -------------------------------------------------
-
-        if (
-            !recommendationData
-        ) {
-
-            throw new Error(
-                "Backend returned an empty response."
+            sessionStorage.setItem(
+                "learnPathRoadmap",
+                JSON.stringify(
+                    recommendationData
+                )
             );
 
+
+        } catch (error) {
+
+            console.error(
+                "Roadmap generation error:",
+                error
+            );
+
+            showError(
+                error.message
+            );
+
+            return;
         }
-
-
-        // -------------------------------------------------
-        // SAVE
-        // -------------------------------------------------
-
-        localStorage.setItem(
-
-            "recommendation",
-
-            JSON.stringify(
-                recommendationData
-            )
-
-        );
-
-
-        // -------------------------------------------------
-        // DISPLAY
-        // -------------------------------------------------
-
-        displayRoadmap(
-
-            profileData,
-
-            recommendationData
-
-        );
-
     }
 
 
-    catch (error) {
+    // -----------------------------------------------------
+    // SAVE CURRENT RECOMMENDATION
+    // -----------------------------------------------------
 
-        console.error(
-            "================================"
-        );
-
-
-        console.error(
-            "ROADMAP GENERATION ERROR"
-        );
-
-
-        console.error(
-            error
-        );
+    localStorage.setItem(
+        "recommendation",
+        JSON.stringify(
+            recommendationData
+        )
+    );
 
 
-        console.error(
-            "================================"
-        );
+    console.log(
+        "FINAL ROADMAP:",
+        recommendationData
+    );
 
 
-        showBackendError(
-            error
-        );
+    // -----------------------------------------------------
+    // DISPLAY
+    // -----------------------------------------------------
 
-    }
-
+    displayRoadmap(
+        profileData,
+        recommendationData
+    );
 }
 
 
@@ -374,12 +259,23 @@ async function loadRoadmap() {
 
 function displayRoadmap(
     profileData,
-    recommendationData
+    roadmapData
 ) {
 
     const learningPath =
-        recommendationData.learning_path
-        || [];
+        Array.isArray(
+            roadmapData.learning_path
+        )
+            ? roadmapData.learning_path
+            : [];
+
+
+    const skillGaps =
+        Array.isArray(
+            roadmapData.skill_gaps
+        )
+            ? roadmapData.skill_gaps
+            : [];
 
 
     const userSkills =
@@ -388,26 +284,19 @@ function displayRoadmap(
         );
 
 
-    const skillGaps =
-        recommendationData.skill_gaps
-        || [];
-
-
     // -----------------------------------------------------
     // GOAL
     // -----------------------------------------------------
 
     const goal =
-        recommendationData.goal
-        ||
-        profileData.goal
-        ||
+        roadmapData.goal ||
+        profileData.goal ||
         "Learning";
 
 
     const goalElement =
         document.getElementById(
-            "goal"
+            "roadmapTitle"
         );
 
 
@@ -415,8 +304,42 @@ function displayRoadmap(
 
         goalElement.textContent =
             `${goal} Journey`;
-
     }
+
+
+    // -----------------------------------------------------
+    // SUBTITLE
+    // -----------------------------------------------------
+
+    const subtitle =
+        document.getElementById(
+            "roadmapSubtitle"
+        );
+
+
+    if (subtitle) {
+
+        const months =
+            profileData.target_months ||
+            6;
+
+        const hours =
+            profileData.study_time ||
+            0;
+
+        subtitle.textContent =
+            `${hours} hours/week • ` +
+            `${months} month target`;
+    }
+
+
+    // -----------------------------------------------------
+    // NAME
+    // -----------------------------------------------------
+
+    updateStudentName(
+        profileData
+    );
 
 
     // -----------------------------------------------------
@@ -433,7 +356,6 @@ function displayRoadmap(
 
         skillsHave.textContent =
             userSkills.length;
-
     }
 
 
@@ -451,7 +373,6 @@ function displayRoadmap(
 
         skillsToLearn.textContent =
             skillGaps.length;
-
     }
 
 
@@ -469,7 +390,6 @@ function displayRoadmap(
 
         recommendedSteps.textContent =
             learningPath.length;
-
     }
 
 
@@ -477,56 +397,27 @@ function displayRoadmap(
     // READINESS
     // -----------------------------------------------------
 
-    let readiness;
+    let readiness =
+        Number(
+            roadmapData.readiness_percentage
+        );
 
 
-    if (
-        typeof
-        recommendationData
-            .readiness_percentage
-        ===
-        "number"
-    ) {
+    if (!Number.isFinite(readiness)) {
 
-        readiness =
-            recommendationData
-                .readiness_percentage;
-
-    }
-
-    else {
-
-        const totalSkills =
-            userSkills.length
-            +
+        const total =
+            userSkills.length +
             skillGaps.length;
 
-
-        if (
-            totalSkills > 0
-        ) {
-
-            readiness =
-                Math.round(
-
+        readiness =
+            total > 0
+                ? Math.round(
                     (
-                        userSkills.length
-                        /
-                        totalSkills
-                    )
-                    *
-                    100
-
-                );
-
-        }
-
-        else {
-
-            readiness = 0;
-
-        }
-
+                        userSkills.length /
+                        total
+                    ) * 100
+                )
+                : 0;
     }
 
 
@@ -540,188 +431,327 @@ function displayRoadmap(
         );
 
 
-    // -----------------------------------------------------
-    // UPDATE READINESS
-    // -----------------------------------------------------
-
-    const readinessPercentage =
+    const readinessElement =
         document.getElementById(
             "readinessPercentage"
         );
 
 
-    if (
-        readinessPercentage
-    ) {
+    if (readinessElement) {
 
-        readinessPercentage.textContent =
+        readinessElement.textContent =
             `${readiness}%`;
-
     }
 
 
-    const readinessText =
-        document.getElementById(
-            "readinessText"
-        );
+    // -----------------------------------------------------
+    // SKILL TAGS
+    // -----------------------------------------------------
+
+    renderSkillMap(
+        userSkills,
+        skillGaps
+    );
+
+
+    // -----------------------------------------------------
+    // ROADMAP
+    // -----------------------------------------------------
+
+    renderRoadmapCards(
+        learningPath
+    );
+
+
+    // -----------------------------------------------------
+    // TOP RECOMMENDATIONS
+    // -----------------------------------------------------
+
+    renderRecommendations(
+        learningPath
+    );
+
+
+    console.log(
+        "================================"
+    );
+
+    console.log(
+        "PERSONALIZED ROADMAP LOADED"
+    );
+
+    console.log(
+        "Goal:",
+        goal
+    );
+
+    console.log(
+        "User Skills:",
+        userSkills
+    );
+
+    console.log(
+        "Skill Gaps:",
+        skillGaps
+    );
+
+    console.log(
+        "Steps:",
+        learningPath.length
+    );
+
+    console.log(
+        "Readiness:",
+        readiness
+    );
+
+    console.log(
+        "================================"
+    );
+}
+
+
+// =========================================================
+// CURRENT SKILLS
+// =========================================================
+
+function getCurrentSkills(
+    profile
+) {
+
+    if (!profile) {
+        return [];
+    }
+
+
+    const fields = [
+        "skills",
+        "current_skills",
+        "currentSkills",
+        "known_skills",
+        "knownSkills",
+        "technical_skills",
+        "technicalSkills"
+    ];
+
+
+    for (
+        const field of fields
+    ) {
+
+        const value =
+            profile[field];
+
+
+        if (
+            Array.isArray(value)
+        ) {
+
+            return value
+                .map(
+                    skill =>
+                        extractSkillName(
+                            skill
+                        )
+                )
+                .filter(Boolean);
+        }
+
+
+        if (
+            typeof value === "string"
+        ) {
+
+            return value
+                .split(",")
+                .map(
+                    skill =>
+                        skill.trim()
+                )
+                .filter(Boolean);
+        }
+    }
+
+
+    return [];
+}
+
+
+// =========================================================
+// SKILL NAME
+// =========================================================
+
+function extractSkillName(
+    skill
+) {
+
+    if (
+        typeof skill === "string"
+    ) {
+
+        return skill.trim();
+    }
 
 
     if (
-        readinessText
+        skill &&
+        typeof skill === "object"
     ) {
 
-        readinessText.textContent =
-            `${readiness}% ready`;
-
+        return (
+            skill.name ||
+            skill.skill ||
+            skill.title ||
+            skill.label ||
+            ""
+        );
     }
 
 
-    // -----------------------------------------------------
-    // DISPLAY SKILL TAGS
-    // -----------------------------------------------------
+    return "";
+}
 
-    const skillTags =
+
+// =========================================================
+// SKILL MAP
+// =========================================================
+
+function renderSkillMap(
+    userSkills,
+    skillGaps
+) {
+
+    const container =
         document.getElementById(
             "skillTags"
         );
 
 
-    if (skillTags) {
-
-        skillTags.innerHTML =
-            "";
-
-
-        // -----------------------------------------------
-        // CURRENT SKILLS
-        // -----------------------------------------------
-
-        userSkills.forEach(
-            skill => {
-
-                const tag =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                tag.className =
-                    "skill-have";
-
-
-                tag.textContent =
-                    "✓ " + skill;
-
-
-                skillTags.appendChild(
-                    tag
-                );
-
-            }
-        );
-
-
-        // -----------------------------------------------
-        // SKILL GAPS
-        // -----------------------------------------------
-
-        skillGaps.forEach(
-            skill => {
-
-                const tag =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                tag.className =
-                    "skill-needed";
-
-
-                tag.textContent =
-                    "→ " + skill;
-
-
-                skillTags.appendChild(
-                    tag
-                );
-
-            }
-        );
-
+    if (!container) {
+        return;
     }
 
 
-    // =====================================================
-    // ROADMAP
-    // =====================================================
+    container.innerHTML = "";
 
-    const roadmapContainer =
+
+    // CURRENT SKILLS
+
+    userSkills.forEach(
+        skill => {
+
+            const tag =
+                document.createElement(
+                    "span"
+                );
+
+            tag.className =
+                "skill-have";
+
+            tag.textContent =
+                `✓ ${skill}`;
+
+            container.appendChild(
+                tag
+            );
+        }
+    );
+
+
+    // REQUIRED SKILLS
+
+    skillGaps.forEach(
+        skill => {
+
+            const tag =
+                document.createElement(
+                    "span"
+                );
+
+            tag.className =
+                "skill-needed";
+
+            tag.textContent =
+                `→ ${skill}`;
+
+            container.appendChild(
+                tag
+            );
+        }
+    );
+
+
+    if (
+        userSkills.length === 0 &&
+        skillGaps.length === 0
+    ) {
+
+        const tag =
+            document.createElement(
+                "span"
+            );
+
+        tag.textContent =
+            "No skill information available.";
+
+        container.appendChild(
+            tag
+        );
+    }
+}
+
+
+// =========================================================
+// ROADMAP CARDS
+// =========================================================
+
+function renderRoadmapCards(
+    learningPath
+) {
+
+    const container =
         document.getElementById(
             "roadmapContainer"
         );
 
 
-    if (!roadmapContainer) {
-
+    if (!container) {
         return;
-
     }
 
 
-    roadmapContainer.innerHTML =
-        "";
+    container.innerHTML = "";
 
-
-    // -----------------------------------------------------
-    // NO COURSES
-    // -----------------------------------------------------
 
     if (
         learningPath.length === 0
     ) {
 
-        roadmapContainer.innerHTML = `
-
+        container.innerHTML = `
             <div class="course-card">
-
                 <h3>
                     No new courses recommended
                 </h3>
 
                 <p>
-                    The AI recommendation engine
-                    did not return any new courses
+                    The recommendation engine
+                    did not return a learning path
                     for this profile.
                 </p>
-
             </div>
-
         `;
 
-
         return;
-
     }
 
 
-    // -----------------------------------------------------
-    // COURSE CARDS
-    // -----------------------------------------------------
-
     learningPath.forEach(
-
-        (
-            course,
-            index
-        ) => {
-
+        (course, index) => {
 
             const step =
                 document.createElement(
                     "div"
                 );
-
 
             step.className =
                 "roadmap-step";
@@ -731,146 +761,98 @@ function displayRoadmap(
                 Array.isArray(
                     course.skills
                 )
+                    ? course.skills.join(", ")
+                    : (
+                        course.skills ||
+                        course.skill ||
+                        "N/A"
+                    );
 
-                    ?
-
-                course.skills.join(
-                    ", "
-                )
-
-                    :
-
-                course.skills
-                ||
-                "N/A";
-
-
-            // -------------------------------------------------
-            // MASTERY VALUES
-            // -------------------------------------------------
 
             const masteryBefore =
                 Number(
-                    course.mastery_before
-                    ??
-                    0
+                    course.mastery_before ?? 0
                 );
 
 
             const masteryGain =
                 Number(
-                    course.mastery_gain
-                    ??
-                    0
+                    course.mastery_gain ?? 0
                 );
 
 
             const masteryAfter =
                 Number(
-                    course.mastery_after
-                    ??
-                    0
+                    course.mastery_after ?? 0
                 );
 
-
-            // -------------------------------------------------
-            // COURSE CARD
-            // -------------------------------------------------
 
             step.innerHTML = `
 
                 <div class="step-number">
-
                     ${index + 1}
-
                 </div>
 
-
                 <div class="course-card">
-
-
-                    <!-- COURSE TOP -->
 
                     <div class="course-top">
 
                         <span class="level">
-
                             ${escapeHTML(
-                                course.level
-                                ||
-                                "N/A"
+                                course.level ||
+                                "Intermediate"
                             )}
-
                         </span>
 
-
                         <span class="hours">
-
                             ${escapeHTML(
-                                course.duration
-                                ||
+                                course.duration ||
                                 "N/A"
                             )}
-
                         </span>
 
                     </div>
 
 
-                    <!-- COURSE TITLE -->
-
                     <h3>
-
                         ${escapeHTML(
-                            course.title
-                            ||
+                            course.title ||
                             "Recommended Course"
                         )}
-
                     </h3>
 
 
-                    <!-- COURSE INFORMATION -->
-
                     <div class="course-info">
 
-
-                        <!-- DESCRIPTION -->
-
                         <p>
-
                             <strong>
                                 Description:
                             </strong>
 
                             ${escapeHTML(
-                                course.description
-                                ||
+                                course.description ||
                                 ""
                             )}
-
                         </p>
 
-
-                        <!-- MASTERY -->
 
                         <div
                             class="mastery-box"
                             style="
-                                margin: 18px 0;
-                                padding: 16px;
-                                border-radius: 10px;
-                                background: rgba(124, 58, 237, 0.10);
-                                border: 1px solid rgba(124, 58, 237, 0.25);
+                                margin:18px 0;
+                                padding:16px;
+                                border-radius:10px;
+                                background:rgba(124,58,237,0.10);
+                                border:1px solid rgba(124,58,237,0.25);
                             "
                         >
 
                             <div
                                 style="
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                    margin-bottom: 8px;
+                                    display:flex;
+                                    justify-content:space-between;
+                                    align-items:center;
+                                    margin-bottom:8px;
                                 "
                             >
 
@@ -878,16 +860,10 @@ function displayRoadmap(
                                     Skill Progress
                                 </strong>
 
-                                <span
-                                    style="
-                                        font-weight: 600;
-                                    "
-                                >
-
+                                <span>
                                     ${masteryBefore}%
                                     →
                                     ${masteryAfter}%
-
                                 </span>
 
                             </div>
@@ -895,23 +871,23 @@ function displayRoadmap(
 
                             <div
                                 style="
-                                    height: 8px;
-                                    background: #272b3a;
-                                    border-radius: 10px;
-                                    overflow: hidden;
+                                    height:8px;
+                                    background:#272b3a;
+                                    border-radius:10px;
+                                    overflow:hidden;
                                 "
                             >
 
                                 <div
                                     style="
-                                        width: ${masteryAfter}%;
-                                        height: 100%;
-                                        background: linear-gradient(
+                                        width:${masteryAfter}%;
+                                        height:100%;
+                                        background:linear-gradient(
                                             90deg,
                                             #7c3aed,
                                             #a855f7
                                         );
-                                        border-radius: 10px;
+                                        border-radius:10px;
                                     "
                                 ></div>
 
@@ -920,8 +896,8 @@ function displayRoadmap(
 
                             <p
                                 style="
-                                    margin-top: 8px;
-                                    margin-bottom: 0;
+                                    margin-top:8px;
+                                    margin-bottom:0;
                                 "
                             >
 
@@ -936,10 +912,7 @@ function displayRoadmap(
                         </div>
 
 
-                        <!-- SKILLS -->
-
                         <p>
-
                             <strong>
                                 Skills:
                             </strong>
@@ -947,39 +920,29 @@ function displayRoadmap(
                             ${escapeHTML(
                                 skills
                             )}
-
                         </p>
 
 
-                        <!-- PROJECT -->
-
                         <p>
-
                             <strong>
                                 Project:
                             </strong>
 
                             ${escapeHTML(
-                                course.project
-                                ||
-                                ""
+                                course.project ||
+                                `Build a practical ${skills} project.`
                             )}
-
                         </p>
-
 
                     </div>
 
-
-                    <!-- PROJECT -->
 
                     <div class="course-project">
 
                         🏆 Complete
 
                         ${escapeHTML(
-                            course.title
-                            ||
+                            course.title ||
                             "this course"
                         )}
 
@@ -988,459 +951,140 @@ function displayRoadmap(
                     </div>
 
 
-                    <!-- BUTTONS -->
-
                     <div class="course-buttons">
 
-
                         <button
-                            onclick="
-                                completeCourse(
-                                    ${index}
-                                )
-                            "
+                            onclick="completeCourse(${index})"
                         >
-
                             Mark Complete
-
                         </button>
-
 
                         <button
-                            onclick="
-                                giveFeedback(
-                                    '${escapeJS(
-                                        course.title
-                                        ||
-                                        "Course"
-                                    )}'
-                                )
-                            "
+                            onclick="giveFeedback(
+                                '${escapeJS(
+                                    course.title ||
+                                    "Course"
+                                )}'
+                            )"
                         >
-
                             Give Feedback
-
                         </button>
-
 
                     </div>
 
-
                 </div>
-
             `;
 
 
-            roadmapContainer.appendChild(
+            container.appendChild(
                 step
             );
-
         }
-
     );
+}
 
 
-    // =====================================================
-    // TOP AI RECOMMENDATIONS
-    // =====================================================
+// =========================================================
+// TOP RECOMMENDATIONS
+// =========================================================
 
-    const recommendationContainer =
+function renderRecommendations(
+    learningPath
+) {
+
+    const container =
         document.getElementById(
             "recommendationContainer"
         );
 
 
-    if (
-        recommendationContainer
-    ) {
-
-        recommendationContainer.innerHTML =
-            "";
-
-
-        learningPath.forEach(
-
-            course => {
-
-                const card =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                card.className =
-                    "recommendation-card";
-
-
-                const skills =
-                    Array.isArray(
-                        course.skills
-                    )
-
-                        ?
-
-                    course.skills.join(
-                        ", "
-                    )
-
-                        :
-
-                    course.skills
-                    ||
-                    "N/A";
-
-
-                const masteryBefore =
-                    Number(
-                        course.mastery_before
-                        ??
-                        0
-                    );
-
-
-                const masteryGain =
-                    Number(
-                        course.mastery_gain
-                        ??
-                        0
-                    );
-
-
-                const masteryAfter =
-                    Number(
-                        course.mastery_after
-                        ??
-                        0
-                    );
-
-
-                card.innerHTML = `
-
-                    <h3>
-
-                        ${escapeHTML(
-                            course.title
-                            ||
-                            "Recommended Course"
-                        )}
-
-                    </h3>
-
-
-                    <p>
-
-                        <strong>
-                            Level:
-                        </strong>
-
-                        ${escapeHTML(
-                            course.level
-                            ||
-                            "N/A"
-                        )}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Duration:
-                        </strong>
-
-                        ${escapeHTML(
-                            course.duration
-                            ||
-                            "N/A"
-                        )}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Skills:
-                        </strong>
-
-                        ${escapeHTML(
-                            skills
-                        )}
-
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Skill Progress:
-                        </strong>
-
-                        ${masteryBefore}%
-                        →
-                        ${masteryAfter}%
-
-                        (+${masteryGain}%)
-
-                    </p>
-
-
-                    <p>
-
-                        ${escapeHTML(
-                            course.description
-                            ||
-                            ""
-                        )}
-
-                    </p>
-
-                `;
-
-
-                recommendationContainer.appendChild(
-                    card
-                );
-
-            }
-
-        );
-
-    }
-
-
-    // =====================================================
-    // DEBUG
-    // =====================================================
-
-    console.log(
-        "================================"
-    );
-
-
-    console.log(
-        "ML ROADMAP LOADED"
-    );
-
-
-    console.log(
-        "Profile:",
-        profileData
-    );
-
-
-    console.log(
-        "User skills:",
-        userSkills
-    );
-
-
-    console.log(
-        "Skill gaps:",
-        skillGaps
-    );
-
-
-    console.log(
-        "Learning path:",
-        learningPath
-    );
-
-
-    console.log(
-        "Readiness:",
-        readiness
-    );
-
-
-    console.log(
-        "================================"
-    );
-
-}
-
-
-// =========================================================
-// GET CURRENT SKILLS
-// =========================================================
-
-function getCurrentSkills(
-    profile
-) {
-
-    if (!profile) {
-
-        return [];
-
-    }
-
-
-    const possibleFields = [
-
-        "skills",
-
-        "current_skills",
-
-        "currentSkills",
-
-        "known_skills",
-
-        "knownSkills",
-
-        "technical_skills",
-
-        "technicalSkills"
-
-    ];
-
-
-    for (
-        const field of possibleFields
-    ) {
-
-        const value =
-            profile[field];
-
-
-        if (
-            Array.isArray(value)
-        ) {
-
-            return value
-
-                .map(
-                    extractSkillName
-                )
-
-                .filter(
-                    Boolean
-                );
-
-        }
-
-
-        if (
-            typeof value
-            ===
-            "string"
-        ) {
-
-            return value
-
-                .split(",")
-
-                .map(
-                    skill =>
-                        skill.trim()
-                )
-
-                .filter(
-                    Boolean
-                );
-
-        }
-
-    }
-
-
-    return [];
-
-}
-
-
-// =========================================================
-// EXTRACT SKILL
-// =========================================================
-
-function extractSkillName(
-    skill
-) {
-
-    if (
-        typeof skill
-        ===
-        "string"
-    ) {
-
-        return skill.trim();
-
-    }
-
-
-    if (
-        typeof skill
-        ===
-        "object"
-
-        &&
-
-        skill !== null
-    ) {
-
-        return (
-
-            skill.name
-
-            ||
-
-            skill.skill
-
-            ||
-
-            skill.title
-
-            ||
-
-            skill.label
-
-            ||
-
-            ""
-
-        );
-
-    }
-
-
-    return "";
-
-}
-
-
-// =========================================================
-// UPDATE STUDENT NAME
-// =========================================================
-
-function updateStudentName(
-    profileData
-) {
-
-    const element =
-        document.getElementById(
-            "topNavName"
-        );
-
-
-    if (
-        !element
-        ||
-        !profileData.name
-    ) {
-
+    if (!container) {
         return;
-
     }
 
 
-    const firstName =
-        profileData.name
-            .trim()
-            .split(/\s+/)[0];
+    container.innerHTML = "";
 
 
-    element.textContent =
-        firstName;
+    learningPath.forEach(
+        course => {
 
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "recommendation-card";
+
+
+            const skills =
+                Array.isArray(
+                    course.skills
+                )
+                    ? course.skills.join(", ")
+                    : (
+                        course.skills ||
+                        course.skill ||
+                        "N/A"
+                    );
+
+
+            card.innerHTML = `
+
+                <h3>
+                    ${escapeHTML(
+                        course.title ||
+                        "Recommended Course"
+                    )}
+                </h3>
+
+                <p>
+                    <strong>
+                        Level:
+                    </strong>
+
+                    ${escapeHTML(
+                        course.level ||
+                        "N/A"
+                    )}
+                </p>
+
+                <p>
+                    <strong>
+                        Duration:
+                    </strong>
+
+                    ${escapeHTML(
+                        course.duration ||
+                        "N/A"
+                    )}
+                </p>
+
+                <p>
+                    <strong>
+                        Skills:
+                    </strong>
+
+                    ${escapeHTML(
+                        skills
+                    )}
+                </p>
+
+                <p>
+                    ${escapeHTML(
+                        course.description ||
+                        ""
+                    )}
+                </p>
+            `;
+
+
+            container.appendChild(
+                card
+            );
+        }
+    );
 }
 
 
@@ -1452,17 +1096,29 @@ function completeCourse(
     index
 ) {
 
-    const recommendation =
-        JSON.parse(
-            localStorage.getItem(
-                "recommendation"
-            )
-        ) || {};
+    let recommendation = {};
+
+
+    try {
+
+        recommendation =
+            JSON.parse(
+                localStorage.getItem(
+                    "recommendation"
+                )
+            ) || {};
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+    }
 
 
     const learningPath =
-        recommendation.learning_path
-        || [];
+        recommendation.learning_path ||
+        [];
 
 
     const course =
@@ -1476,21 +1132,29 @@ function completeCourse(
         );
 
         return;
-
     }
 
 
-    const completed =
-        JSON.parse(
-            localStorage.getItem(
-                "completedCourses"
-            )
-        ) || [];
+    let completed = [];
+
+
+    try {
+
+        completed =
+            JSON.parse(
+                localStorage.getItem(
+                    "completedCourses"
+                )
+            ) || [];
+
+    } catch (error) {
+
+        completed = [];
+    }
 
 
     const courseName =
-        course.title
-        ||
+        course.title ||
         `Course ${index + 1}`;
 
 
@@ -1503,25 +1167,20 @@ function completeCourse(
         completed.push(
             courseName
         );
-
     }
 
 
     localStorage.setItem(
-
         "completedCourses",
-
         JSON.stringify(
             completed
         )
-
     );
 
 
     alert(
         "Course marked as completed! 🎉"
     );
-
 }
 
 
@@ -1544,13 +1203,8 @@ function giveFeedback(
         console.log(
             "Course feedback:",
             {
-
-                course:
-                    course,
-
-                feedback:
-                    feedback
-
+                course: course,
+                feedback: feedback
             }
         );
 
@@ -1558,9 +1212,7 @@ function giveFeedback(
         alert(
             "Thank you for your feedback! ❤️"
         );
-
     }
-
 }
 
 
@@ -1570,42 +1222,182 @@ function giveFeedback(
 
 function showLoading() {
 
-    const roadmapContainer =
+    const container =
         document.getElementById(
             "roadmapContainer"
         );
 
 
-    if (
-        roadmapContainer
-    ) {
-
-        roadmapContainer.innerHTML = `
-
-            <div class="course-card">
-
-                <h3>
-
-                    🤖 Generating your
-                    personalized learning path...
-
-                </h3>
-
-
-                <p>
-
-                    The AI recommendation engine
-                    is analyzing your skills,
-                    experience and learning goals.
-
-                </p>
-
-            </div>
-
-        `;
-
+    if (!container) {
+        return;
     }
 
+
+    container.innerHTML = `
+
+        <div class="course-card">
+
+            <h3>
+                🤖 Generating your
+                personalized learning path...
+            </h3>
+
+            <p>
+                The AI recommendation engine
+                is analyzing your skills,
+                experience and learning goal.
+            </p>
+
+        </div>
+    `;
+}
+
+
+// =========================================================
+// ERROR
+// =========================================================
+
+function showError(
+    message
+) {
+
+    const container =
+        document.getElementById(
+            "roadmapContainer"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = `
+
+        <div class="course-card">
+
+            <h3>
+                ⚠️ Unable to generate roadmap
+            </h3>
+
+            <p>
+                <strong>
+                    Error:
+                </strong>
+            </p>
+
+            <pre
+                style="
+                    white-space:pre-wrap;
+                    word-break:break-word;
+                "
+            >${escapeHTML(
+                message
+            )}</pre>
+
+            <p>
+                Make sure the backend and
+                ML services are running.
+            </p>
+
+        </div>
+    `;
+}
+
+
+// =========================================================
+// NAME
+// =========================================================
+
+function updateStudentName(
+    profile
+) {
+
+    const element =
+        document.getElementById(
+            "topNavName"
+        );
+
+
+    if (
+        element &&
+        profile &&
+        profile.name
+    ) {
+
+        element.textContent =
+            profile.name
+                .trim()
+                .split(/\s+/)[0];
+    }
+}
+
+
+// =========================================================
+// HTML ESCAPE
+// =========================================================
+
+function escapeHTML(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+// =========================================================
+// JAVASCRIPT ESCAPE
+// =========================================================
+
+function escapeJS(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
+        .replace(
+            /'/g,
+            "\\'"
+        )
+        .replace(
+            /"/g,
+            '\\"'
+        )
+        .replace(
+            /\n/g,
+            "\\n"
+        )
+        .replace(
+            /\r/g,
+            "\\r"
+        );
 }
 
 
