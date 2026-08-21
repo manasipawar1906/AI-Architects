@@ -4,8 +4,12 @@ import requests
 from backend.schemas import (
     LearnerProfile,
     RecommendationResponse,
-    CourseRecommendation
+    CourseRecommendation,
+    ChatRequest,
+    ChatResponse
 )
+
+from backend.ai_service import ask_groq
 
 
 # =========================================================
@@ -1065,3 +1069,104 @@ def recommend(
             detail=str(error)
 
         )
+
+# =========================================================
+# AI CHAT ASSISTANT
+# =========================================================
+
+@router.post(
+    "/chat",
+    response_model=ChatResponse
+)
+def chat(
+    request: ChatRequest
+):
+
+    try:
+
+        print(
+            "\n================================"
+        )
+
+        print(
+            "LEARNPATH AI - GROQ CHAT REQUEST"
+        )
+
+        print(
+            "================================"
+        )
+
+        print(
+            "Student:",
+            request.profile.name
+        )
+
+        print(
+            "Goal:",
+            request.profile.goal
+        )
+
+        print(
+            "Question:",
+            request.question
+        )
+
+
+        # -------------------------------------------------
+        # CALL GROQ
+        # -------------------------------------------------
+
+        answer = ask_groq(
+            question=request.question,
+            profile=request.profile,
+            roadmap=request.roadmap,
+            history=request.history
+        )
+
+
+        print(
+            "\nGroq response generated successfully."
+        )
+
+        print(
+            "================================\n"
+        )
+
+
+        return ChatResponse(
+            answer=answer
+        )
+
+
+    except Exception as error:
+
+        print(
+            "\n================================"
+        )
+
+        print(
+            "GROQ CHAT ERROR"
+        )
+
+        print(
+            "================================"
+        )
+
+        print(
+            error
+        )
+
+        print(
+            "================================\n"
+        )
+
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "The AI Assistant could not "
+                "generate a response. "
+                "Please try again."
+            )
+        )
+

@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-
 from typing import List
 
 
@@ -7,10 +6,7 @@ from typing import List
 # LEARNER PROFILE
 # =========================================================
 
-class LearnerProfile(
-    BaseModel
-):
-
+class LearnerProfile(BaseModel):
     name: str = ""
 
     email: str = ""
@@ -42,10 +38,7 @@ class LearnerProfile(
 # COURSE RECOMMENDATION
 # =========================================================
 
-class CourseRecommendation(
-    BaseModel
-):
-
+class CourseRecommendation(BaseModel):
     title: str
 
     level: str
@@ -60,10 +53,9 @@ class CourseRecommendation(
 
     project: str = ""
 
-
-    # =====================================================
+    # -----------------------------------------------------
     # MASTERY INFORMATION
-    # =====================================================
+    # -----------------------------------------------------
 
     mastery_before: float = 0.0
 
@@ -76,10 +68,7 @@ class CourseRecommendation(
 # RECOMMENDATION RESPONSE
 # =========================================================
 
-class RecommendationResponse(
-    BaseModel
-):
-
+class RecommendationResponse(BaseModel):
     skill_gaps: List[str] = Field(
         default_factory=list
     )
@@ -101,3 +90,39 @@ class RecommendationResponse(
     goal: str = ""
 
     readiness_percentage: int = 0
+
+
+# =========================================================
+# AI CHAT MESSAGE
+# =========================================================
+
+class ChatMessage(BaseModel):
+    role: str
+
+    content: str
+
+
+# =========================================================
+# AI CHAT REQUEST
+# =========================================================
+
+class ChatRequest(BaseModel):
+    question: str
+
+    profile: LearnerProfile = Field(
+        default_factory=LearnerProfile
+    )
+
+    roadmap: RecommendationResponse | None = None
+
+    history: List[ChatMessage] = Field(
+        default_factory=list
+    )
+
+
+# =========================================================
+# AI CHAT RESPONSE
+# =========================================================
+
+class ChatResponse(BaseModel):
+    answer: str
