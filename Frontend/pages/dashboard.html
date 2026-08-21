@@ -1,115 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>LearnPath AI - Dashboard</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/dashboard.css"
+    >
 </head>
+
+
 <body>
 
 <div class="app-container">
-    <!-- SIDEBAR -->
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
     <aside class="sidebar">
-        <div class="logo">🧠 LearnPath <span>AI</span></div>
-        <nav class="side-nav">
-            <a href="profile.html">My Learning</a>
-            <a href="roadmap.html">Roadmaps</a>
-            <a href="dashboard.html" class="active">Dashboard</a>
-            <a href="assistant.html">AI Assistant</a>
-        </nav>
-    </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-        <header class="top-bar" style="justify-content: flex-end;">
-            <div class="user-profile">
-                <div class="user-info">
-                    <strong id="topNavName">Student</strong>
-                    <span>Student</span>
-                </div>
-            </div>
-        </header>
-
-        <div class="dashboard-header">
-            <h1 id="welcomeMessage">Welcome back! 👋</h1>
-            <p>Your personalized learning journey continues</p>
+        <div class="logo">
+            🧠 LearnPath <span>AI</span>
         </div>
 
-        <!-- GRADIENT CARDS -->
+
+        <nav class="side-nav">
+
+            <a href="profile.html">
+                My Learning
+            </a>
+
+            <a href="roadmap.html">
+                Roadmaps
+            </a>
+
+            <a
+                href="dashboard.html"
+                class="active"
+            >
+                Dashboard
+            </a>
+
+            <a href="assistant.html">
+                AI Assistant
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             TOP BAR
+             ================================================= -->
+
+        <header
+            class="top-bar"
+            style="justify-content: flex-end;"
+        >
+
+            <div class="user-profile">
+
+                <div class="user-info">
+
+                    <!-- Filled dynamically by dashboard.js -->
+                    <strong id="topNavName">
+                        Student
+                    </strong>
+
+                    <span>
+                        Student
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             DASHBOARD HEADER
+             ================================================= -->
+
+        <div class="dashboard-header">
+
+            <h1 id="welcomeMessage">
+                Welcome back! 👋
+            </h1>
+
+            <p>
+                Your personalized learning journey continues
+            </p>
+
+        </div>
+
+
+
+        <!-- =================================================
+             GRADIENT CARDS
+             ================================================= -->
+
         <section class="gradient-cards">
+
+
+            <!-- OVERALL PROGRESS -->
+
             <div class="g-card red">
-                <h3>Overall Progress</h3>
-                <strong id="progress">0%</strong>
+
+                <h3>
+                    Overall Progress
+                </h3>
+
+                <!-- Dynamic -->
+                <strong id="progress">
+                    0%
+                </strong>
+
             </div>
+
+
+
+            <!-- COMPLETED COURSES -->
+
             <div class="g-card blue">
-                <h3>Completed Courses</h3>
-                <strong id="completed">0</strong>
+
+                <h3>
+                    Completed Courses
+                </h3>
+
+                <!-- Dynamic -->
+                <strong id="completed">
+                    0
+                </strong>
+
             </div>
+
+
+
+            <!-- AVAILABLE COURSES -->
+
             <div class="g-card teal">
-                <h3>Available Courses</h3>
-                <strong>25</strong>
+
+                <h3>
+                    Available Courses
+                </h3>
+
+                <!-- Dynamic -->
+                <strong id="availableCourses">
+                    0
+                </strong>
+
             </div>
+
+
+
+            <!-- STUDY TIME -->
+
             <div class="g-card purple">
-                <h3>Study Time</h3>
-                <strong>4h/wk</strong>
+
+                <h3>
+                    Study Time
+                </h3>
+
+                <!-- Dynamic -->
+                <strong id="studyTime">
+                    Not set
+                </strong>
+
             </div>
+
+
         </section>
 
-        <!-- CHARTS SECTION -->
+
+
+        <!-- =================================================
+             CHARTS SECTION
+             ================================================= -->
+
         <section class="charts-section">
+
+
+            <!-- =================================================
+                 SKILL DEVELOPMENT
+                 ================================================= -->
+
             <div class="chart-card">
-                <h2>Skill Development</h2>
-                <div class="bar-chart">
-                    <div>
-                        <span style="height: 75%"></span>
-                        <label>SQL</label>
-                    </div>
-                    <div>
-                        <span style="height: 45%"></span>
-                        <label>Python</label>
-                    </div>
-                    <div>
-                        <span style="height: 60%"></span>
-                        <label>Statistics</label>
-                    </div>
+
+                <h2>
+                    Skill Development
+                </h2>
+
+                <!--
+
+                    dashboard.js will generate the
+                    skill bars here from:
+
+                    - Current skills
+                    - Skill gaps
+                    - ML recommendation
+
+                -->
+
+                <div
+                    class="bar-chart"
+                    id="skillChart"
+                >
+
+                    <p style="opacity: 0.7;">
+                        Loading skill development...
+                    </p>
+
                 </div>
+
             </div>
+
+
+
+            <!-- =================================================
+                 LEARNING PROGRESS
+                 ================================================= -->
+
             <div class="chart-card">
-                <h2>Learning Progress</h2>
-                <div class="donut">
-                    <div class="donut-center">
-                        33%
+
+                <h2>
+                    Learning Progress
+                </h2>
+
+
+                <div
+                    class="donut"
+                    id="progressDonut"
+                >
+
+                    <div
+                        class="donut-center"
+                        id="donutPercentage"
+                    >
+                        0%
                     </div>
+
                 </div>
+
             </div>
+
+
         </section>
 
-        <!-- COMPLETED LEARNING -->
+
+
+        <!-- =================================================
+             COMPLETED LEARNING
+             ================================================= -->
+
         <section class="ai-recommendation">
-            <div class="icon">🎯</div>
-            <div class="info">
-                <h3>Completed Learning</h3>
-                <p id="completedMessage">No completed courses yet. Start your roadmap to see progress here.</p>
+
+            <div class="icon">
+                🎯
             </div>
+
+
+            <div class="info">
+
+                <h3>
+                    Completed Learning
+                </h3>
+
+
+                <p id="completedMessage">
+                    No completed courses yet.
+                    Start your roadmap to see progress here.
+                </p>
+
+            </div>
+
         </section>
+
+
     </main>
+
 </div>
 
-<script src="../js/dashboard.js"></script>
-<!-- Session Storage Script -->
-<script>
-    const savedProfile = JSON.parse(sessionStorage.getItem("learnPathProfile"));
-    if (savedProfile && savedProfile.name) {
-        const firstName = savedProfile.name.split(" ")[0];
-        
-        const topName = document.getElementById("topNavName");
-        if (topName) topName.textContent = firstName;
 
-        const welcomeMsg = document.getElementById("welcomeMessage");
-        if (welcomeMsg) welcomeMsg.textContent = `Welcome back, ${firstName}! 👋`;
-    }
-</script>
+
+<!-- =========================================================
+     DASHBOARD JAVASCRIPT
+     ========================================================= -->
+
+<script src="../js/dashboard.js"></script>
+
+
 </body>
+
 </html>
