@@ -14,20 +14,19 @@
     <aside class="sidebar">
         <div class="logo">🧠 LearnPath <span>AI</span></div>
         <nav class="side-nav">
-            <a href="dashboard.html">Dashboard</a>
             <a href="profile.html">My Learning</a>
-            <a href="assistant.html" class="active">AI Mentor</a>
             <a href="roadmap.html">Roadmaps</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="assistant.html" class="active">AI Assistant</a>
         </nav>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-        <header class="top-bar">
-            <input type="text" class="search-bar" placeholder="Search courses, topics, or skills...">
+        <header class="top-bar" style="justify-content: flex-end;">
             <div class="user-profile">
                 <div class="user-info">
-                    <strong>Manasi</strong>
+                    <strong id="topNavName">Student</strong>
                     <span>Student</span>
                 </div>
             </div>
@@ -39,10 +38,9 @@
         </div>
 
         <section class="chat-box">
-            <!-- Bound to JS IDs -->
             <div class="messages" id="messages">
-                <div class="message ai">
-                    Hi Manasi! 👋 I'm your learning assistant. Ask me why something was recommended, what your skill gaps are, or how to adjust your roadmap.
+                <div class="message ai" id="aiWelcomeMessage">
+                    Hi! 👋 I'm your learning assistant. Ask me why something was recommended, what your skill gaps are, or how to adjust your roadmap.
                 </div>
             </div>
 
@@ -55,5 +53,22 @@
 </div>
 
 <script src="../js/assistant.js"></script>
+<!-- Updated Session Script -->
+<script>
+    const savedProfile = JSON.parse(sessionStorage.getItem("learnPathProfile"));
+    
+    const topName = document.getElementById("topNavName");
+    const aiWelcome = document.getElementById("aiWelcomeMessage");
+
+    if (savedProfile && savedProfile.name) {
+        const firstName = savedProfile.name.split(" ")[0];
+        
+        if (topName) topName.textContent = firstName;
+        if (aiWelcome) aiWelcome.textContent = `Hi ${firstName}! 👋 I'm your learning assistant. Ask me why something was recommended, what your skill gaps are, or how to adjust your roadmap.`;
+    } else {
+        if (topName) topName.textContent = "Student";
+        if (aiWelcome) aiWelcome.textContent = `Hi! 👋 I'm your learning assistant. Ask me why something was recommended, what your skill gaps are, or how to adjust your roadmap.`;
+    }
+</script>
 </body>
 </html>

@@ -46,7 +46,16 @@
     transition: 0.2s;
 }
 
-.form-group select option { background: var(--bg-card); color: white; }
+/* Forces dropdown background and text to stay dark */
+.form-group select {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    color: white !important;
+}
+
+.form-group select option {
+    background-color: #151821 !important;
+    color: white !important;
+}
 
 .form-group input:focus, .form-group select:focus {
     border-color: var(--accent-purple);

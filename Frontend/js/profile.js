@@ -1,93 +1,62 @@
-const profileForm = document.getElementById("profileForm");
+// Pointing to your local FastAPI server
+const API_URL = "http://127.0.0.1:8000/recommend";
 
-profileForm.addEventListener("submit", async function (event) {
+document.getElementById("profileForm").addEventListener("submit", async function(event) {
+    event.preventDefault(); // Stop page from reloading
 
-    event.preventDefault();
-
+    // 1. Gather all the data from the form
     const profileData = {
-
-        name: document.getElementById("name").value,
-
-        goal: document.getElementById("career").value,
-
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        goal: document.getElementById("career").value, 
         experience: document.getElementById("experience").value,
-
-        study_time:
-            document.getElementById("hours").value +
-            " hours/day for " +
-            document.getElementById("months").value +
-            " months",
-
-        interests:
-            document.getElementById("interests")
-                .value
-                .split(",")
-                .map(x => x.trim())
-                .filter(x => x !== ""),
-
-        skills:
-            document.getElementById("skills")
-                .value
-                .split(",")
-                .map(x => x.trim())
-                .filter(x => x !== ""),
-
-        previous_courses:
-            document.getElementById("completed").value,
-
-        learning_style:
-            document.getElementById("learningStyle").value
+        
+        skills: document.getElementById("skills").value.split(',').map(item => item.trim()).filter(item => item),
+        interests: document.getElementById("interests").value.split(',').map(item => item.trim()).filter(item => item),
+        completed: document.getElementById("completed").value.split(',').map(item => item.trim()).filter(item => item),
+        
+        learningStyle: document.getElementById("learningStyle").value,
+        
+        // FORCED AS A STRING TO MATCH BACKEND MODEL
+        study_time: document.getElementById("hours").value.toString().trim(),
+        
+        months: parseInt(document.getElementById("months").value)
     };
 
-    console.log("Sending profile to backend:", profileData);
+    // 2. Save profile to the current session
+    sessionStorage.setItem("learnPathProfile", JSON.stringify(profileData));
+
+    // 3. Update button state
+    const btn = document.querySelector(".generate-btn");
+    const originalText = btn.textContent;
+    btn.textContent = "Generating your AI Roadmap...";
+    btn.disabled = true;
 
     try {
-
-        const response = await fetch(
-            "http://127.0.0.1:8000/recommend",
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify(profileData)
-            }
-        );
+        // 4. Send data to Python backend
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(profileData)
+        });
 
         if (!response.ok) {
-            throw new Error(
-                "Backend returned status " + response.status
-            );
+            throw new Error(`Server returned status ${response.status}`);
         }
 
-        const result = await response.json();
+        const roadmapData = await response.json();
 
-        console.log("Backend response:", result);
-
-        // Save profile
-        localStorage.setItem(
-            "learnPathProfile",
-            JSON.stringify(profileData)
-        );
-
-        // Save recommendation returned by backend
-        localStorage.setItem(
-            "recommendation",
-            JSON.stringify(result)
-        );
-
-        // Go to roadmap
+        // 5. Save roadmap and redirect to the clean UI roadmap page
+        sessionStorage.setItem("learnPathRoadmap", JSON.stringify(roadmapData));
         window.location.href = "roadmap.html";
 
     } catch (error) {
-
-        console.error("Backend connection error:", error);
-
-        alert(
-            "Could not connect to the backend. " +
-            "Make sure FastAPI is running on port 8000."
-        );
+        console.error("Error generating roadmap:", error);
+        alert("Failed to connect to the backend. Make sure your Python server is running.");
+        
+        btn.textContent = originalText;
+        btn.disabled = false;
     }
 });

@@ -16,129 +16,63 @@ router = APIRouter()
 
 
 # =========================================================
-# ML SERVICE CONFIGURATION
+# ML SERVICE
 # =========================================================
 
-# FastAPI backend runs on port 8000
-# ML Flask service runs on port 8001
-
-ML_SERVICE_URL = "http://127.0.0.1:8001"
+ML_SERVICE_URL = (
+    "http://127.0.0.1:8001"
+)
 
 
 # =========================================================
 # HEALTH CHECK
 # =========================================================
 
-@router.get("/health")
+@router.get(
+    "/health"
+)
 def health_check():
 
     return {
-        "status": "ok",
-        "message": "Backend is running"
+
+        "status":
+            "ok",
+
+        "message":
+            "Backend is running"
     }
 
 
 # =========================================================
-# CONVERT LEARNER PROFILE INTO ML DATA
+# EXTRACT STUDY HOURS
 # =========================================================
 
-def prepare_ml_data(profile: LearnerProfile):
-
-    # -----------------------------------------------------
-    # Normalize skills and interests
-    # -----------------------------------------------------
-
-    skills = {
-        skill.strip().lower()
-        for skill in profile.skills
-        if skill.strip()
-    }
-
-    interests = {
-        interest.strip().lower()
-        for interest in profile.interests
-        if interest.strip()
-    }
-
-    experience = profile.experience.lower()
-    goal = profile.goal.lower()
-
-
-    # -----------------------------------------------------
-    # CALCULATE SKILL SCORES
-    #
-    # Current prototype:
-    # If the learner declares a skill, we give it 100%.
-    #
-    # Later:
-    # These values should come from actual quiz scores,
-    # course completion and learner activity.
-    # -----------------------------------------------------
-
-    python_score = (
-        100
-        if "python" in skills
-        else 0
-    )
-
-    statistics_score = (
-        100
-        if "statistics" in skills
-        else 0
-    )
-
-    ml_score = (
-        100
-        if (
-            "machine learning" in skills
-            or "ml" in skills
-        )
-        else 0
-    )
-
-    dl_score = (
-        100
-        if (
-            "deep learning" in skills
-            or "dl" in skills
-        )
-        else 0
-    )
-
-    nlp_score = (
-        100
-        if (
-            "nlp" in skills
-            or "natural language processing" in skills
-        )
-        else 0
-    )
-
-    transformers_score = (
-        100
-        if "transformers" in skills
-        else 0
-    )
-
-
-    # -----------------------------------------------------
-    # STUDY HOURS
-    #
-    # Extract a number from values such as:
-    # "8 hours/week"
-    # "10 hours"
-    # "5"
-    # -----------------------------------------------------
-
-    study_hours = 5.0
+def extract_study_hours(
+    study_time
+):
 
     try:
 
+        if study_time is None:
+
+            return 5.0
+
+
+        text = str(
+            study_time
+        )
+
+
         number = ""
 
-        for character in profile.study_time:
 
-            if character.isdigit() or character == ".":
+        for character in text:
+
+            if (
+                character.isdigit()
+                or
+                character == "."
+            ):
 
                 number += character
 
@@ -146,49 +80,260 @@ def prepare_ml_data(profile: LearnerProfile):
 
                 break
 
-        if number:
 
-            study_hours = float(number)
+        return (
+            float(number)
+            if number
+            else 5.0
+        )
+
 
     except Exception:
 
-        study_hours = 5.0
+        return 5.0
 
 
-    # -----------------------------------------------------
-    # QUIZ AVERAGE
-    #
-    # Current prototype:
-    # Estimate quiz performance from declared skills.
-    #
-    # Later:
-    # Replace this with real quiz scores.
-    # -----------------------------------------------------
+# =========================================================
+# NORMALIZE SKILLS
+# =========================================================
 
-    skill_scores = [
-        python_score,
-        statistics_score,
-        ml_score,
-        dl_score,
-        nlp_score,
-        transformers_score
-    ]
+def normalize_skills(
+    skill_list
+):
 
-    quiz_average = (
-        sum(skill_scores) /
-        len(skill_scores)
+    if not skill_list:
+
+        return set()
+
+
+    return {
+
+        str(skill)
+        .strip()
+        .lower()
+
+        for skill in skill_list
+
+        if str(skill).strip()
+
+    }
+
+
+# =========================================================
+# PREPARE ML DATA
+# =========================================================
+
+def prepare_ml_data(
+    profile: LearnerProfile
+):
+
+    skills = normalize_skills(
+        profile.skills
     )
 
 
-    # -----------------------------------------------------
-    # AVERAGE ATTEMPTS
-    #
-    # Current prototype:
-    # Estimate attempts using experience level.
-    #
-    # Later:
-    # Calculate from real course attempts.
-    # -----------------------------------------------------
+    interests = normalize_skills(
+        profile.interests
+    )
+
+
+    experience = str(
+        profile.experience or ""
+    ).strip().lower()
+
+
+    goal = str(
+        profile.goal or ""
+    ).strip().lower()
+
+
+    # =====================================================
+    # PYTHON
+    # =====================================================
+
+    python_score = (
+
+        100
+
+        if any(
+
+            s == "python"
+            or
+            "python" in s
+
+            for s in skills
+
+        )
+
+        else 0
+
+    )
+
+
+    # =====================================================
+    # STATISTICS
+    # =====================================================
+
+    statistics_score = (
+
+        100
+
+        if any(
+
+            "statistics" in s
+            or
+            "statistical" in s
+
+            for s in skills
+
+        )
+
+        else 0
+
+    )
+
+
+    # =====================================================
+    # MACHINE LEARNING
+    # =====================================================
+
+    ml_score = (
+
+        100
+
+        if any(
+
+            s in {
+                "ml",
+                "machine learning",
+                "machine-learning"
+            }
+
+            for s in skills
+
+        )
+
+        else 0
+
+    )
+
+
+    # =====================================================
+    # DEEP LEARNING
+    # =====================================================
+
+    dl_score = (
+
+        100
+
+        if any(
+
+            s in {
+                "dl",
+                "deep learning",
+                "deep-learning"
+            }
+
+            for s in skills
+
+        )
+
+        else 0
+
+    )
+
+
+    # =====================================================
+    # NLP
+    # =====================================================
+
+    nlp_score = (
+
+        100
+
+        if any(
+
+            s == "nlp"
+            or
+            "natural language processing"
+            in s
+
+            for s in skills
+
+        )
+
+        else 0
+
+    )
+
+
+    # =====================================================
+    # TRANSFORMERS
+    # =====================================================
+
+    transformers_score = (
+
+        100
+
+        if any(
+
+            "transformer" in s
+
+            for s in skills
+
+        )
+
+        else 0
+
+    )
+
+
+    # =====================================================
+    # STUDY HOURS
+    # =====================================================
+
+    study_hours = extract_study_hours(
+        profile.study_time
+    )
+
+
+    # =====================================================
+    # QUIZ AVERAGE
+    # =====================================================
+
+    skill_scores = [
+
+        python_score,
+
+        statistics_score,
+
+        ml_score,
+
+        dl_score,
+
+        nlp_score,
+
+        transformers_score
+
+    ]
+
+
+    quiz_average = (
+
+        sum(skill_scores)
+        /
+        len(skill_scores)
+
+        if skill_scores
+
+        else 50.0
+
+    )
+
+
+    # =====================================================
+    # ATTEMPTS
+    # =====================================================
 
     if "beginner" in experience:
 
@@ -203,56 +348,34 @@ def prepare_ml_data(profile: LearnerProfile):
         average_attempts = 1
 
 
-    # -----------------------------------------------------
-    # COURSE DIFFICULTY
-    #
-    # 1 = Beginner
-    # 3 = Intermediate
-    # 5 = Advanced
-    # -----------------------------------------------------
+    # =====================================================
+    # COMPLETED COURSE IDS
+    # =====================================================
 
-    if "beginner" in experience:
-
-        course_difficulty = 2
-
-    elif "intermediate" in experience:
-
-        course_difficulty = 3
-
-    else:
-
-        course_difficulty = 4
+    completed_ids = []
 
 
-    # -----------------------------------------------------
-    # INFER COMPLETED FOUNDATIONAL COURSES
-    #
-    # Current ML course dataset:
-    #
-    # Course 1 = Python Basics
-    # Course 3 = Statistics for Data Science
-    #
-    # If the learner already has a strong declared skill,
-    # we treat the corresponding foundation as completed.
-    #
-    # Later:
-    # This will come from actual course completion records.
-    # -----------------------------------------------------
+    for course in (
+        profile.completed or []
+    ):
 
-    completed_courses = []
+        try:
 
-    if python_score >= 80:
+            completed_ids.append(
+                int(course)
+            )
 
-        completed_courses.append(1)
+        except (
+            TypeError,
+            ValueError
+        ):
 
-    if statistics_score >= 80:
-
-        completed_courses.append(3)
+            pass
 
 
-    # -----------------------------------------------------
-    # RETURN DATA FOR ML SERVICE
-    # -----------------------------------------------------
+    # =====================================================
+    # RETURN ML PAYLOAD
+    # =====================================================
 
     return {
 
@@ -283,31 +406,53 @@ def prepare_ml_data(profile: LearnerProfile):
                 study_hours,
 
             "average_attempts":
-                average_attempts
+                average_attempts,
 
+            # ---------------------------------------------
+            # RECOMMENDER METADATA
+            # ---------------------------------------------
+
+            "_goal":
+                goal,
+
+            "_interests":
+                list(interests),
+
+            "_experience":
+                experience,
+
+            "_all_skills":
+                list(skills),
+
+            "_completed_names":
+                list(
+                    profile.completed or []
+                )
         },
 
-        "completedCourses":
-            completed_courses
 
+        "completedCourses":
+            completed_ids
     }
 
 
 # =========================================================
-# RECOMMENDATION ENDPOINT
+# RECOMMEND
 # =========================================================
 
 @router.post(
     "/recommend",
-    response_model=RecommendationResponse
+    response_model=
+        RecommendationResponse
 )
-def recommend(profile: LearnerProfile):
+def recommend(
+    profile: LearnerProfile
+):
 
     try:
 
         # -------------------------------------------------
-        # STEP 1
-        # Convert learner profile into ML input
+        # PREPARE DATA
         # -------------------------------------------------
 
         ml_data = prepare_ml_data(
@@ -315,9 +460,17 @@ def recommend(profile: LearnerProfile):
         )
 
 
-        print("\n================================")
-        print("LEARNPATH AI - ML REQUEST")
-        print("================================")
+        print(
+            "\n================================"
+        )
+
+        print(
+            "LEARNPATH AI - ML REQUEST"
+        )
+
+        print(
+            "================================"
+        )
 
         print(
             "Learner:",
@@ -330,35 +483,49 @@ def recommend(profile: LearnerProfile):
         )
 
         print(
+            "Experience:",
+            profile.experience
+        )
+
+        print(
             "Skills:",
             profile.skills
         )
 
         print(
-            "ML Data:",
-            ml_data
+            "Interests:",
+            profile.interests
+        )
+
+        print(
+            "Completed:",
+            profile.completed
+        )
+
+        print(
+            "Study Time:",
+            profile.study_time
         )
 
 
         # -------------------------------------------------
-        # STEP 2
-        # Send learner data to ML service
+        # CALL ML SERVICE
         # -------------------------------------------------
 
         response = requests.post(
 
-            f"{ML_SERVICE_URL}/api/recommend",
+            f"{ML_SERVICE_URL}"
+            "/api/recommend",
 
             json=ml_data,
 
-            timeout=10
+            timeout=30
 
         )
 
 
         # -------------------------------------------------
-        # STEP 3
-        # Check ML service response
+        # ML ERROR
         # -------------------------------------------------
 
         if response.status_code != 200:
@@ -368,55 +535,70 @@ def recommend(profile: LearnerProfile):
                 response.text
             )
 
+
             raise HTTPException(
 
                 status_code=500,
 
                 detail=(
-                    "ML service returned an error: "
+                    "ML service returned "
+                    f"an error: "
                     f"{response.text}"
                 )
 
             )
 
 
+        # -------------------------------------------------
+        # READ RESPONSE
+        # -------------------------------------------------
+
         ml_result = response.json()
 
 
-        # -------------------------------------------------
-        # STEP 4
-        # Verify ML response
-        # -------------------------------------------------
-
-        if not ml_result.get("success"):
+        if not ml_result.get(
+            "success"
+        ):
 
             raise HTTPException(
 
                 status_code=500,
 
-                detail="ML recommendation failed"
+                detail=(
+                    "ML recommendation failed"
+                )
 
             )
 
 
         recommendations = (
+
             ml_result.get(
                 "recommendations",
                 []
             )
+
         )
 
 
         print(
-            "ML Recommendations:",
+            "\nML Recommendations:"
+        )
+
+        print(
             recommendations
         )
 
 
-        # -------------------------------------------------
-        # STEP 5
-        # Prepare response lists
-        # -------------------------------------------------
+        print(
+            "Number of recommendations:",
+            len(recommendations)
+        )
+
+
+        # =================================================
+        # BUILD RESPONSE
+        # =================================================
 
         learning_path = []
 
@@ -427,71 +609,158 @@ def recommend(profile: LearnerProfile):
         skill_gaps = []
 
 
-        # -------------------------------------------------
-        # STEP 6
-        # Convert ML recommendations into the existing
-        # CourseRecommendation schema
-        # -------------------------------------------------
-
-        for recommendation in recommendations:
-
-            course_name = recommendation.get(
-
-                "course_name",
-
-                "Recommended Course"
-
-            )
+        learner_skills = normalize_skills(
+            profile.skills
+        )
 
 
-            skill = recommendation.get(
+        for recommendation in (
+            recommendations
+        ):
 
-                "skill",
+            # ---------------------------------------------
+            # BASIC COURSE DATA
+            # ---------------------------------------------
 
-                "General"
+            course_name = (
 
-            )
+                recommendation.get(
 
+                    "course_name",
 
-            difficulty = recommendation.get(
+                    "Recommended Course"
 
-                "difficulty",
-
-                3
+                )
 
             )
 
 
-            estimated_hours = recommendation.get(
+            skill = (
 
-                "estimated_hours",
+                recommendation.get(
 
-                5
+                    "skill",
 
-            )
+                    "General"
 
-
-            predicted_success = recommendation.get(
-
-                "predicted_success",
-
-                0
+                )
 
             )
 
 
-            reason = recommendation.get(
+            difficulty = (
 
-                "reason",
+                recommendation.get(
 
-                "Recommended based on your learning profile."
+                    "difficulty",
+
+                    3
+
+                )
 
             )
 
 
-            # -------------------------------------------------
-            # Convert numerical difficulty to level
-            # -------------------------------------------------
+            estimated_hours = (
+
+                recommendation.get(
+
+                    "estimated_hours",
+
+                    5
+
+                )
+
+            )
+
+
+            predicted_success = (
+
+                recommendation.get(
+
+                    "predicted_success",
+
+                    0
+
+                )
+
+            )
+
+
+            reason = (
+
+                recommendation.get(
+
+                    "reason",
+
+                    "Recommended based on "
+                    "your learning profile."
+
+                )
+
+            )
+
+
+            # ---------------------------------------------
+            # MASTERY DATA
+            # ---------------------------------------------
+
+            mastery_before = (
+
+                recommendation.get(
+
+                    "mastery_before",
+
+                    0
+
+                )
+
+            )
+
+
+            mastery_gain = (
+
+                recommendation.get(
+
+                    "mastery_gain",
+
+                    0
+
+                )
+
+            )
+
+
+            mastery_after = (
+
+                recommendation.get(
+
+                    "mastery_after",
+
+                    0
+
+                )
+
+            )
+
+
+            # ---------------------------------------------
+            # DIFFICULTY
+            # ---------------------------------------------
+
+            try:
+
+                difficulty = int(
+                    difficulty
+                )
+
+            except (
+                TypeError,
+                ValueError
+            ):
+
+                difficulty = 3
+
 
             if difficulty <= 2:
 
@@ -506,9 +775,9 @@ def recommend(profile: LearnerProfile):
                 level = "Advanced"
 
 
-            # -------------------------------------------------
-            # Create CourseRecommendation object
-            # -------------------------------------------------
+            # ---------------------------------------------
+            # COURSE
+            # ---------------------------------------------
 
             course = CourseRecommendation(
 
@@ -522,7 +791,8 @@ def recommend(profile: LearnerProfile):
 
                 description=(
                     f"{reason} "
-                    f"Predicted success probability: "
+                    f"Predicted success "
+                    f"probability: "
                     f"{predicted_success}%."
                 ),
 
@@ -533,8 +803,16 @@ def recommend(profile: LearnerProfile):
                 project=(
                     f"Complete a practical "
                     f"{skill} project."
-                )
+                ),
 
+                mastery_before=
+                    mastery_before,
+
+                mastery_gain=
+                    mastery_gain,
+
+                mastery_after=
+                    mastery_after
             )
 
 
@@ -542,10 +820,6 @@ def recommend(profile: LearnerProfile):
                 course
             )
 
-
-            # -------------------------------------------------
-            # Project suggestion
-            # -------------------------------------------------
 
             projects.append(
 
@@ -555,61 +829,57 @@ def recommend(profile: LearnerProfile):
             )
 
 
-            # -------------------------------------------------
-            # Assessment suggestion
-            # -------------------------------------------------
-
             assessments.append(
 
-                f"{course_name} Assessment"
+                f"{course_name} "
+                f"Assessment"
 
             )
 
 
-            # -------------------------------------------------
-            # Skill gap
-            #
-            # Only add a skill if the learner does NOT
-            # already have it as a strong declared skill.
-            # -------------------------------------------------
+            # ---------------------------------------------
+            # SKILL GAP
+            # ---------------------------------------------
 
-            learner_skills = {
+            normalized_skill = (
 
-                item.strip().lower()
+                str(skill)
+                .strip()
+                .lower()
 
-                for item in profile.skills
+            )
 
-            }
 
-            if skill.lower() not in learner_skills:
+            if (
+                normalized_skill
+                not in learner_skills
+            ):
 
-                if skill not in skill_gaps:
+                if (
+                    skill
+                    not in skill_gaps
+                ):
 
                     skill_gaps.append(
                         skill
                     )
 
 
-        # -------------------------------------------------
-        # STEP 7
-        # Calculate readiness percentage
-        #
-        # Current prototype:
-        # Number of declared skills compared with
-        # declared skills + identified skill gaps.
-        #
-        # Later:
-        # Use actual ML mastery predictions.
-        # -------------------------------------------------
+        # =================================================
+        # READINESS
+        # =================================================
 
         current_skills = len(
-            profile.skills
+            profile.skills or []
         )
 
+
         total_skill_count = (
+
             current_skills
             +
             len(skill_gaps)
+
         )
 
 
@@ -626,13 +896,11 @@ def recommend(profile: LearnerProfile):
                     /
                     total_skill_count
                 )
-                *
-                100
+
+                * 100
 
             )
 
-
-        # Keep value between 0 and 100
 
         readiness = max(
 
@@ -646,30 +914,92 @@ def recommend(profile: LearnerProfile):
         )
 
 
-        # -------------------------------------------------
-        # STEP 8
-        # Return response in your existing format
-        # -------------------------------------------------
+        # =================================================
+        # LOG
+        # =================================================
+
+        print(
+            "\n================================"
+        )
+
+        print(
+            "ROADMAP GENERATED"
+        )
+
+        print(
+            "================================"
+        )
+
+        print(
+            "Total Steps:",
+            len(learning_path)
+        )
+
+
+        for index, course in enumerate(
+
+            learning_path,
+
+            start=1
+
+        ):
+
+            print(
+
+                f"Step {index}: "
+                f"{course.title} | "
+                f"{course.mastery_before}% -> "
+                f"{course.mastery_after}%"
+
+            )
+
+
+        print(
+            "Skill Gaps:",
+            skill_gaps
+        )
+
+
+        print(
+            "Readiness:",
+            readiness
+        )
+
+
+        print(
+            "================================\n"
+        )
+
+
+        # =================================================
+        # RETURN
+        # =================================================
 
         return RecommendationResponse(
 
-            skill_gaps=skill_gaps,
+            skill_gaps=
+                skill_gaps,
 
-            learning_path=learning_path,
+            learning_path=
+                learning_path,
 
-            projects=projects,
+            projects=
+                projects,
 
-            assessments=assessments,
+            assessments=
+                assessments,
 
-            goal=profile.goal,
+            goal=
+                profile.goal,
 
-            readiness_percentage=readiness
+            readiness_percentage=
+                readiness
 
         )
 
 
     # =====================================================
-    # ERROR: ML SERVICE NOT RUNNING
+    # CONNECTION ERROR
     # =====================================================
 
     except requests.exceptions.ConnectionError:
@@ -679,16 +1009,19 @@ def recommend(profile: LearnerProfile):
             status_code=503,
 
             detail=(
+
                 "ML service is not running. "
-                "Please start LearnPath-AI-ML/app.py "
+
+                "Please start the ML service "
                 "on port 8001."
+
             )
 
         )
 
 
     # =====================================================
-    # ERROR: ML SERVICE TIMEOUT
+    # TIMEOUT
     # =====================================================
 
     except requests.exceptions.Timeout:
@@ -705,7 +1038,7 @@ def recommend(profile: LearnerProfile):
 
 
     # =====================================================
-    # RE-RAISE HTTP EXCEPTIONS
+    # HTTP EXCEPTION
     # =====================================================
 
     except HTTPException:
@@ -723,6 +1056,7 @@ def recommend(profile: LearnerProfile):
             "\nRecommendation Error:",
             error
         )
+
 
         raise HTTPException(
 

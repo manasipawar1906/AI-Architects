@@ -14,33 +14,31 @@
     <aside class="sidebar">
         <div class="logo">🧠 LearnPath <span>AI</span></div>
         <nav class="side-nav">
-            <a href="dashboard.html" class="active">Dashboard</a>
             <a href="profile.html">My Learning</a>
-            <a href="assistant.html">AI Mentor</a>
             <a href="roadmap.html">Roadmaps</a>
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="assistant.html">AI Assistant</a>
         </nav>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-        <header class="top-bar">
-            <input type="text" class="search-bar" placeholder="Search courses, topics, or skills...">
+        <header class="top-bar" style="justify-content: flex-end;">
             <div class="user-profile">
                 <div class="user-info">
-                    <strong>Manasi</strong>
+                    <strong id="topNavName">Student</strong>
                     <span>Student</span>
                 </div>
             </div>
         </header>
 
         <div class="dashboard-header">
-            <h1>Welcome back, Manasi! 👋</h1>
+            <h1 id="welcomeMessage">Welcome back! 👋</h1>
             <p>Your personalized learning journey continues</p>
         </div>
 
         <!-- GRADIENT CARDS -->
         <section class="gradient-cards">
-            <!-- Bound to JS IDs -->
             <div class="g-card red">
                 <h3>Overall Progress</h3>
                 <strong id="progress">0%</strong>
@@ -61,7 +59,6 @@
 
         <!-- CHARTS SECTION -->
         <section class="charts-section">
-            
             <div class="chart-card">
                 <h2>Skill Development</h2>
                 <div class="bar-chart">
@@ -79,7 +76,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="chart-card">
                 <h2>Learning Progress</h2>
                 <div class="donut">
@@ -88,10 +84,9 @@
                     </div>
                 </div>
             </div>
-
         </section>
 
-        <!-- COMPLETED LEARNING (Bound to JS) -->
+        <!-- COMPLETED LEARNING -->
         <section class="ai-recommendation">
             <div class="icon">🎯</div>
             <div class="info">
@@ -99,10 +94,22 @@
                 <p id="completedMessage">No completed courses yet. Start your roadmap to see progress here.</p>
             </div>
         </section>
-
     </main>
 </div>
 
 <script src="../js/dashboard.js"></script>
+<!-- Session Storage Script -->
+<script>
+    const savedProfile = JSON.parse(sessionStorage.getItem("learnPathProfile"));
+    if (savedProfile && savedProfile.name) {
+        const firstName = savedProfile.name.split(" ")[0];
+        
+        const topName = document.getElementById("topNavName");
+        if (topName) topName.textContent = firstName;
+
+        const welcomeMsg = document.getElementById("welcomeMessage");
+        if (welcomeMsg) welcomeMsg.textContent = `Welcome back, ${firstName}! 👋`;
+    }
+</script>
 </body>
 </html>

@@ -8,7 +8,7 @@
     --accent-blue: #3B82F6;
     --border-color: rgba(255, 255, 255, 0.05);
     
-    /* Gradient Cards */
+    /* Vibrant Gradient Cards */
     --grad-red: linear-gradient(135deg, #FF6B6B, #9D4EDD);
     --grad-blue: linear-gradient(135deg, #4361EE, #3A0CA3);
     --grad-teal: linear-gradient(135deg, #2EC4B6, #0077B6);
@@ -91,19 +91,9 @@ body {
 
 .top-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     margin-bottom: 30px;
-}
-
-.search-bar {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    padding: 10px 20px;
-    border-radius: 20px;
-    width: 400px;
-    color: white;
-    outline: none;
 }
 
 .user-profile {

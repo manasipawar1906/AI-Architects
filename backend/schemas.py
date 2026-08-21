@@ -1,28 +1,50 @@
-from typing import List
-
 from pydantic import BaseModel, Field
 
-
-class LearnerProfile(BaseModel):
-
-    name: str = Field(..., min_length=1)
-
-    goal: str
-
-    experience: str
-
-    study_time: str
-
-    interests: List[str] = []
-
-    skills: List[str] = []
-
-    previous_courses: str = ""
-
-    learning_style: str = "Mixed Learning"
+from typing import List
 
 
-class CourseRecommendation(BaseModel):
+# =========================================================
+# LEARNER PROFILE
+# =========================================================
+
+class LearnerProfile(
+    BaseModel
+):
+
+    name: str = ""
+
+    email: str = ""
+
+    goal: str = ""
+
+    experience: str = "Beginner"
+
+    skills: List[str] = Field(
+        default_factory=list
+    )
+
+    interests: List[str] = Field(
+        default_factory=list
+    )
+
+    completed: List[str] = Field(
+        default_factory=list
+    )
+
+    learning_style: str = "Mixed"
+
+    study_time: str = "4"
+
+    target_months: int = 6
+
+
+# =========================================================
+# COURSE RECOMMENDATION
+# =========================================================
+
+class CourseRecommendation(
+    BaseModel
+):
 
     title: str
 
@@ -32,22 +54,50 @@ class CourseRecommendation(BaseModel):
 
     description: str
 
-    skills: List[str]
+    skills: List[str] = Field(
+        default_factory=list
+    )
 
-    project: str
+    project: str = ""
 
 
-class RecommendationResponse(BaseModel):
+    # =====================================================
+    # MASTERY INFORMATION
+    # =====================================================
 
-    skill_gaps: List[str]
+    mastery_before: float = 0.0
 
-    learning_path: List[CourseRecommendation]
+    mastery_gain: float = 0.0
 
-    projects: List[str]
+    mastery_after: float = 0.0
 
-    assessments: List[str]
 
-    goal: str
+# =========================================================
+# RECOMMENDATION RESPONSE
+# =========================================================
 
-    # NEW
-    readiness_percentage: int
+class RecommendationResponse(
+    BaseModel
+):
+
+    skill_gaps: List[str] = Field(
+        default_factory=list
+    )
+
+    learning_path: List[
+        CourseRecommendation
+    ] = Field(
+        default_factory=list
+    )
+
+    projects: List[str] = Field(
+        default_factory=list
+    )
+
+    assessments: List[str] = Field(
+        default_factory=list
+    )
+
+    goal: str = ""
+
+    readiness_percentage: int = 0

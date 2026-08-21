@@ -14,28 +14,27 @@
     <aside class="sidebar">
         <div class="logo">🧠 LearnPath <span>AI</span></div>
         <nav class="side-nav">
-            <a href="dashboard.html">Dashboard</a>
             <a href="profile.html">My Learning</a>
-            <a href="assistant.html">AI Mentor</a>
             <a href="roadmap.html" class="active">Roadmaps</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="assistant.html">AI Assistant</a>
         </nav>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-        <header class="top-bar">
-            <input type="text" class="search-bar" placeholder="Search courses, topics, or skills...">
+        <header class="top-bar" style="justify-content: flex-end;">
             <div class="user-profile">
                 <div class="user-info">
-                    <strong>Manasi</strong>
+                    <strong id="topNavName">Student</strong>
                     <span>Student</span>
                 </div>
             </div>
         </header>
 
         <div class="roadmap-header">
-            <h1>NLP Engineer Journey</h1>
-            <p>183 estimated learning hours · about 46 weeks at 4 hours/week</p>
+            <h1>Your Learning Journey</h1>
+            <p id="roadmapSubtitle">Estimated timeline based on your profile</p>
         </div>
 
         <section class="summary-grid">
@@ -73,12 +72,21 @@
 
         <section class="recommendations">
             <h2>Top AI Recommendations</h2>
-            <!-- Dynamic JS Container -->
             <div class="recommendation-grid" id="recommendationContainer"></div>
         </section>
     </main>
 </div>
 
 <script src="../js/roadmap.js"></script>
+<!-- Session Storage Script -->
+<script>
+    const savedProfile = JSON.parse(sessionStorage.getItem("learnPathProfile"));
+    if (savedProfile && savedProfile.name) {
+        const topName = document.getElementById("topNavName");
+        if (topName) {
+            topName.textContent = savedProfile.name.split(" ")[0]; 
+        }
+    }
+</script>
 </body>
 </html>

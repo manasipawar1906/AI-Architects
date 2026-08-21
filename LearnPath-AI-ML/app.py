@@ -1,50 +1,147 @@
-from flask import Flask, request, jsonify
-from recommender import recommend_courses
+from fastapi import FastAPI, HTTPException
 
-app = Flask(__name__)
-
-
-@app.route("/", methods=["GET"])
-def home():
-    return jsonify({
-        "success": True,
-        "message": "LearnPath AI ML Service is running"
-    })
+from recommender import (
+    recommend_courses
+)
 
 
-@app.route("/api/recommend", methods=["POST"])
-def recommend():
+# =========================================================
+# APPLICATION
+# =========================================================
+
+app = FastAPI(
+
+    title=
+        "LearnPath AI ML Service",
+
+    description=
+        "Machine learning recommendation "
+        "service for LearnPath AI",
+
+    version=
+        "2.0.0"
+)
+
+
+# =========================================================
+# ROOT
+# =========================================================
+
+@app.get("/")
+def root():
+
+    return {
+
+        "message":
+            "LearnPath AI ML service is running",
+
+        "service":
+            "ML Recommendation Engine",
+
+        "endpoint":
+            "/api/recommend"
+    }
+
+
+# =========================================================
+# HEALTH
+# =========================================================
+
+@app.get("/health")
+def health():
+
+    return {
+
+        "status":
+            "ok",
+
+        "service":
+            "ml"
+    }
+
+
+# =========================================================
+# RECOMMENDATION
+# =========================================================
+
+@app.post("/api/recommend")
+def recommend(
+    payload: dict
+):
+
     try:
-        data = request.get_json()
 
-        if not data:
-            return jsonify({
-                "success": False,
-                "message": "No learner data provided"
-            }), 400
+        # -------------------------------------------------
+        # USER DATA
+        # -------------------------------------------------
 
-        user = data.get("user", {})
-        completed_courses = data.get("completedCourses", [])
-
-        recommendations = recommend_courses(
-            user,
-            completed_courses
+        user = payload.get(
+            "user",
+            {}
         )
 
-        return jsonify({
-            "success": True,
-            "recommendations": recommendations
-        })
+
+        # -------------------------------------------------
+        # COMPLETED COURSES
+        # -------------------------------------------------
+
+        completed_courses = (
+
+            payload.get(
+                "completedCourses",
+                []
+            )
+
+        )
+
+
+        # -------------------------------------------------
+        # NUMBER OF RECOMMENDATIONS
+        # -------------------------------------------------
+
+        recommendations = recommend_courses(
+
+            user=user,
+
+            completed_courses=
+                completed_courses,
+
+            number_of_recommendations=
+                10
+
+        )
+
+
+        # -------------------------------------------------
+        # RESPONSE
+        # -------------------------------------------------
+
+        return {
+
+            "success":
+                True,
+
+            "recommendations":
+                recommendations,
+
+            "count":
+                len(recommendations)
+
+        }
+
 
     except Exception as error:
-        print("Recommendation Error:", error)
 
-        return jsonify({
-            "success": False,
-            "message": "Recommendation failed",
-            "error": str(error)
-        }), 500
+        print(
+            "ML Recommendation Error:",
+            error
+        )
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8001, debug=True)
+        raise HTTPException(
+
+            status_code=500,
+
+            detail=str(error)
+
+        )

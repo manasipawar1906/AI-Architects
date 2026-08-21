@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import joblib
 
@@ -11,31 +12,27 @@ COURSES_PATH = "dataset/courses.csv"
 
 
 # =========================================================
-# LOAD MODEL AND COURSE DATA
+# LOAD MODEL
 # =========================================================
 
 try:
+    model = joblib.load(MODEL_PATH)
 
-    model = joblib.load(
-        MODEL_PATH
-    )
-
-    print(
-        "ML model loaded successfully."
-    )
+    print("================================")
+    print("ML MODEL LOADED SUCCESSFULLY")
+    print("================================")
 
 except Exception as error:
 
-    print(
-        "ERROR: Could not load model.pkl"
-    )
-
-    print(
-        error
-    )
+    print("ERROR: Could not load model.pkl")
+    print(error)
 
     model = None
 
+
+# =========================================================
+# LOAD COURSE DATASET
+# =========================================================
 
 try:
 
@@ -50,186 +47,490 @@ try:
 
 except Exception as error:
 
-    print(
-        "ERROR: Could not load courses.csv"
-    )
-
-    print(
-        error
-    )
+    print("ERROR: Could not load courses.csv")
+    print(error)
 
     courses = pd.DataFrame()
 
 
 # =========================================================
-# SKILL → MODEL FEATURE MAPPING
+# NORMALIZATION
 # =========================================================
 
-SKILL_COLUMNS = {
+def normalize_text(value):
 
-    "Python":
-        "python_score",
+    if value is None:
+        return ""
 
-    "Statistics":
-        "statistics_score",
+    value = str(value).strip().lower()
 
-    "ML":
-        "ml_score",
+    value = re.sub(
+        r"[^a-z0-9]+",
+        " ",
+        value
+    )
 
-    "DL":
-        "dl_score",
-
-    "NLP":
-        "nlp_score",
-
-    "Transformers":
-        "transformers_score"
-
-}
+    return re.sub(
+        r"\s+",
+        " ",
+        value
+    ).strip()
 
 
 # =========================================================
-# NORMALIZE SKILL NAME
+# NORMALIZE SKILLS
 # =========================================================
 
 def normalize_skill(skill):
 
-    if not skill:
-
-        return ""
-
-    skill = skill.strip().lower()
-
+    value = normalize_text(
+        skill
+    )
 
     mapping = {
 
+        # Python
         "python":
             "Python",
 
+        # Statistics
         "statistics":
             "Statistics",
 
         "statistical":
             "Statistics",
 
+        "statistical analysis":
+            "Statistics",
+
+        "probability":
+            "Statistics",
+
+        # Machine Learning
         "machine learning":
+            "ML",
+
+        "machine learning engineer":
             "ML",
 
         "ml":
             "ML",
 
+        # Deep Learning
         "deep learning":
+            "DL",
+
+        "deep learning engineer":
             "DL",
 
         "dl":
             "DL",
 
+        # NLP
         "nlp":
             "NLP",
 
         "natural language processing":
             "NLP",
 
-        "transformers":
-            "Transformers"
+        "natural language":
+            "NLP",
 
+        # Transformers
+        "transformer":
+            "Transformers",
+
+        "transformers":
+            "Transformers",
+
+        # Data Analysis
+        "pandas":
+            "Data Analysis",
+
+        "data analysis":
+            "Data Analysis",
+
+        "data analytics":
+            "Data Analysis",
+
+        "data analyst":
+            "Data Analysis",
+
+        # AI
+        "ai":
+            "AI",
+
+        "artificial intelligence":
+            "AI"
+    }
+
+    return mapping.get(
+        value,
+        str(skill).strip().title()
+    )
+
+
+# =========================================================
+# CAREER GOAL PROFILES
+# =========================================================
+
+GOAL_PROFILES = {
+
+    "data_scientist": {
+
+        "keywords": [
+            "data scientist",
+            "data science",
+            "data scientist engineer"
+        ],
+
+        "weights": {
+
+            "Python": 0.95,
+
+            "Statistics": 1.00,
+
+            "Data Analysis": 1.00,
+
+            "ML": 0.95,
+
+            "DL": 0.25,
+
+            "NLP": 0.10,
+
+            "Transformers": 0.05,
+
+            "AI": 0.20
+        }
+    },
+
+
+    "data_analyst": {
+
+        "keywords": [
+            "data analyst",
+            "data analytics",
+            "business analyst"
+        ],
+
+        "weights": {
+
+            "Python": 0.85,
+
+            "Statistics": 1.00,
+
+            "Data Analysis": 1.00,
+
+            "ML": 0.45,
+
+            "DL": 0.05,
+
+            "NLP": 0.05,
+
+            "Transformers": 0.02,
+
+            "AI": 0.10
+        }
+    },
+
+
+    "machine_learning": {
+
+        "keywords": [
+            "machine learning engineer",
+            "machine learning",
+            "ml engineer",
+            "ml developer"
+        ],
+
+        "weights": {
+
+            "Python": 0.95,
+
+            "Statistics": 0.90,
+
+            "ML": 1.00,
+
+            "Data Analysis": 0.45,
+
+            "DL": 0.75,
+
+            "NLP": 0.15,
+
+            "Transformers": 0.15,
+
+            "AI": 0.35
+        }
+    },
+
+
+    "nlp": {
+
+        "keywords": [
+            "nlp engineer",
+            "nlp developer",
+            "natural language processing",
+            "natural language engineer"
+        ],
+
+        "weights": {
+
+            "Python": 0.90,
+
+            "Statistics": 0.65,
+
+            "ML": 0.80,
+
+            "DL": 0.55,
+
+            "NLP": 1.00,
+
+            "Transformers": 1.00,
+
+            "Data Analysis": 0.20,
+
+            "AI": 0.55
+        }
+    },
+
+
+    "ai_engineer": {
+
+        "keywords": [
+            "ai engineer",
+            "ai developer",
+            "artificial intelligence engineer",
+            "artificial intelligence developer"
+        ],
+
+        "weights": {
+
+            "Python": 0.90,
+
+            "Statistics": 0.65,
+
+            "ML": 0.95,
+
+            "DL": 0.90,
+
+            "NLP": 0.65,
+
+            "Transformers": 0.90,
+
+            "Data Analysis": 0.20,
+
+            "AI": 1.00
+        }
+    },
+
+
+    "deep_learning": {
+
+        "keywords": [
+            "deep learning engineer",
+            "deep learning",
+            "computer vision engineer",
+            "neural network engineer"
+        ],
+
+        "weights": {
+
+            "Python": 0.90,
+
+            "Statistics": 0.65,
+
+            "ML": 0.90,
+
+            "DL": 1.00,
+
+            "NLP": 0.35,
+
+            "Transformers": 0.50,
+
+            "Data Analysis": 0.15,
+
+            "AI": 0.55
+        }
+    }
+}
+
+
+# =========================================================
+# GET GOAL PROFILE
+# =========================================================
+
+def get_goal_profile(
+    goal,
+    interests
+):
+
+    normalized_goal = normalize_text(
+        goal
+    )
+
+    normalized_interests = [
+
+        normalize_text(item)
+
+        for item in (
+            interests or []
+        )
+    ]
+
+
+    # -----------------------------------------------------
+    # EXACT GOAL MATCH
+    # -----------------------------------------------------
+
+    for profile in GOAL_PROFILES.values():
+
+        for keyword in profile["keywords"]:
+
+            if keyword in normalized_goal:
+
+                return dict(
+                    profile["weights"]
+                )
+
+
+    # -----------------------------------------------------
+    # INTEREST-BASED FALLBACK
+    # -----------------------------------------------------
+
+    inferred = {
+
+        "Python": 0.20,
+
+        "Statistics": 0.20,
+
+        "ML": 0.20,
+
+        "DL": 0.10,
+
+        "NLP": 0.10,
+
+        "Transformers": 0.05,
+
+        "Data Analysis": 0.10,
+
+        "AI": 0.15
     }
 
 
-    return mapping.get(
-        skill,
-        skill.title()
+    interest_text = " ".join(
+        normalized_interests
     )
 
 
+    if (
+        "nlp" in interest_text
+        or
+        "natural language" in interest_text
+    ):
+
+        inferred["NLP"] = 0.90
+
+        inferred["Transformers"] = 0.80
+
+
+    if (
+        "machine learning" in interest_text
+        or
+        " ml " in f" {interest_text} "
+    ):
+
+        inferred["ML"] = 0.90
+
+
+    if "deep learning" in interest_text:
+
+        inferred["DL"] = 0.90
+
+
+    if (
+        "generative ai" in interest_text
+        or
+        "genai" in interest_text
+    ):
+
+        inferred["AI"] = 0.90
+
+        inferred["Transformers"] = 0.90
+
+
+    if (
+        "data science" in interest_text
+        or
+        "data analysis" in interest_text
+    ):
+
+        inferred["Data Analysis"] = 0.90
+
+        inferred["Statistics"] = 0.85
+
+
+    return inferred
+
+
 # =========================================================
-# CALCULATE SKILL GAPS
+# BUILD SKILL MASTERY
 # =========================================================
 
-def calculate_skill_gap(user):
+def build_skill_mastery(user):
 
-    gaps = {}
+    skills = [
 
+        normalize_skill(skill)
 
-    for skill in SKILL_COLUMNS:
-
-        score = user.get(
-            skill,
-            0
+        for skill in user.get(
+            "_all_skills",
+            []
         )
+    ]
 
 
-        try:
-
-            score = float(
-                score
-            )
-
-        except (TypeError, ValueError):
-
-            score = 0
-
-
-        score = max(
-            0,
-            min(
-                100,
-                score
-            )
-        )
-
-
-        gaps[skill] = round(
-            100 - score,
-            2
-        )
-
-
-    return gaps
-
-
-# =========================================================
-# GET CURRENT SKILL SCORE
-# =========================================================
-
-def get_skill_score(
-    user,
-    skill
-):
-
-    normalized_skill = normalize_skill(
-        skill
+    skill_set = set(
+        skills
     )
 
 
-    score = user.get(
-        normalized_skill,
-        0
-    )
+    mastery = {
+
+        "Python":
+            100 if "Python" in skill_set else 0,
+
+        "Statistics":
+            100 if "Statistics" in skill_set else 0,
+
+        "ML":
+            100 if "ML" in skill_set else 0,
+
+        "DL":
+            100 if "DL" in skill_set else 0,
+
+        "NLP":
+            100 if "NLP" in skill_set else 0,
+
+        "Transformers":
+            100
+            if "Transformers" in skill_set
+            else 0,
+
+        "Data Analysis":
+            100
+            if "Data Analysis" in skill_set
+            else 0,
+
+        "AI":
+            100 if "AI" in skill_set else 0
+    }
 
 
-    try:
-
-        score = float(
-            score
-        )
-
-    except (TypeError, ValueError):
-
-        score = 0
-
-
-    return max(
-        0,
-        min(
-            100,
-            score
-        )
-    )
+    return mastery
 
 
 # =========================================================
-# PREDICT SUCCESS PROBABILITY
+# ML SUCCESS PREDICTION
 # =========================================================
 
 def predict_success(
@@ -237,19 +538,10 @@ def predict_success(
     difficulty
 ):
 
-    # -----------------------------------------------------
-    # Check whether model exists
-    # -----------------------------------------------------
-
     if model is None:
 
-        return 0.5
+        return 0.50
 
-
-    # -----------------------------------------------------
-    # Build exactly the same features that were used
-    # during model training.
-    # -----------------------------------------------------
 
     features = pd.DataFrame([{
 
@@ -309,13 +601,8 @@ def predict_success(
 
         "course_difficulty":
             difficulty
-
     }])
 
-
-    # -----------------------------------------------------
-    # Predict probability
-    # -----------------------------------------------------
 
     try:
 
@@ -323,9 +610,14 @@ def predict_success(
             features
         )[0][1]
 
-
         return float(
-            probability
+            max(
+                0.0,
+                min(
+                    1.0,
+                    probability
+                )
+            )
         )
 
     except Exception as error:
@@ -335,11 +627,139 @@ def predict_success(
             error
         )
 
-        return 0.5
+        return 0.50
 
 
 # =========================================================
-# CHECK COURSE PREREQUISITES
+# COURSE DIFFICULTY
+# =========================================================
+
+def get_course_difficulty(
+    course
+):
+
+    try:
+
+        difficulty = int(
+            course.get(
+                "difficulty",
+                3
+            )
+        )
+
+    except (
+        TypeError,
+        ValueError
+    ):
+
+        difficulty = 3
+
+
+    return max(
+        1,
+        min(
+            5,
+            difficulty
+        )
+    )
+
+
+# =========================================================
+# COURSE HOURS
+# =========================================================
+
+def get_course_hours(
+    course
+):
+
+    try:
+
+        hours = int(
+            course.get(
+                "estimated_hours",
+                5
+            )
+        )
+
+    except (
+        TypeError,
+        ValueError
+    ):
+
+        hours = 5
+
+
+    return max(
+        1,
+        hours
+    )
+
+
+# =========================================================
+# PREREQUISITES
+# =========================================================
+
+def get_prerequisite_ids(
+    prerequisites
+):
+
+    if prerequisites is None:
+
+        return []
+
+
+    try:
+
+        if pd.isna(
+            prerequisites
+        ):
+
+            return []
+
+    except Exception:
+
+        pass
+
+
+    text = str(
+        prerequisites
+    ).strip()
+
+
+    if not text:
+
+        return []
+
+
+    result = []
+
+
+    for value in text.split(","):
+
+        value = value.strip()
+
+
+        if not value:
+
+            continue
+
+
+        try:
+
+            result.append(
+                int(value)
+            )
+
+        except ValueError:
+
+            return []
+
+
+    return result
+
+
+# =========================================================
+# CHECK PREREQUISITES
 # =========================================================
 
 def prerequisites_satisfied(
@@ -347,248 +767,97 @@ def prerequisites_satisfied(
     completed_courses
 ):
 
-    # -----------------------------------------------------
-    # No prerequisites
-    # -----------------------------------------------------
+    required = get_prerequisite_ids(
+        prerequisites
+    )
 
-    if (
-        pd.isna(prerequisites)
-        or
-        str(prerequisites).strip() == ""
+
+    completed = set()
+
+
+    for course_id in (
+        completed_courses or []
     ):
 
-        return True
+        try:
 
+            completed.add(
+                int(course_id)
+            )
 
-    # -----------------------------------------------------
-    # Convert completed course IDs to integers
-    # -----------------------------------------------------
+        except (
+            TypeError,
+            ValueError
+        ):
 
-    completed_courses = [
+            continue
 
-        int(course)
-
-        for course in completed_courses
-
-    ]
-
-
-    # -----------------------------------------------------
-    # Read prerequisite IDs
-    # -----------------------------------------------------
-
-    try:
-
-        required_courses = [
-
-            int(course.strip())
-
-            for course
-            in str(prerequisites).split(",")
-
-            if course.strip()
-
-        ]
-
-    except ValueError:
-
-        return False
-
-
-    # -----------------------------------------------------
-    # Check whether ALL prerequisites are completed
-    # -----------------------------------------------------
 
     return all(
 
-        course in completed_courses
+        course_id in completed
 
-        for course in required_courses
+        for course_id in required
 
     )
 
 
 # =========================================================
-# GENERATE RECOMMENDATION REASON
+# RESOLVE COMPLETED COURSES
 # =========================================================
 
-def generate_reason(
-    skill,
-    current_skill,
-    skill_gap,
-    success_probability,
-    difficulty
+def resolve_completed_courses(
+    completed_ids,
+    completed_names
 ):
 
-    # -----------------------------------------------------
-    # Skill status
-    # -----------------------------------------------------
-
-    if current_skill < 30:
-
-        skill_status = (
-            f"Your {skill} skill is currently "
-            f"very low at {current_skill:.0f}%."
-        )
-
-    elif current_skill < 60:
-
-        skill_status = (
-            f"Your {skill} skill is currently "
-            f"developing at {current_skill:.0f}%."
-        )
-
-    elif current_skill < 80:
-
-        skill_status = (
-            f"Your {skill} skill is currently "
-            f"at {current_skill:.0f}% and can be improved."
-        )
-
-    else:
-
-        skill_status = (
-            f"Your {skill} skill is already strong "
-            f"at {current_skill:.0f}%."
-        )
+    completed = set()
 
 
     # -----------------------------------------------------
-    # Success status
+    # COURSE IDS
     # -----------------------------------------------------
 
-    success_percentage = (
-        success_probability * 100
-    )
+    for course_id in (
+        completed_ids or []
+    ):
 
+        try:
 
-    if success_percentage >= 75:
+            completed.add(
+                int(course_id)
+            )
 
-        success_status = (
-            f"The model predicts a high "
-            f"success probability of "
-            f"{success_percentage:.1f}%."
-        )
+        except (
+            TypeError,
+            ValueError
+        ):
 
-    elif success_percentage >= 50:
-
-        success_status = (
-            f"The model predicts a moderate "
-            f"success probability of "
-            f"{success_percentage:.1f}%."
-        )
-
-    else:
-
-        success_status = (
-            f"The model predicts a lower "
-            f"success probability of "
-            f"{success_percentage:.1f}%, "
-            f"so this may be challenging."
-        )
+            pass
 
 
     # -----------------------------------------------------
-    # Difficulty
+    # COURSE NAMES
     # -----------------------------------------------------
 
-    difficulty_names = {
+    normalized_names = {
 
-        1: "Beginner",
+        normalize_text(name)
 
-        2: "Beginner",
+        for name in (
+            completed_names or []
+        )
 
-        3: "Intermediate",
-
-        4: "Advanced",
-
-        5: "Advanced"
-
+        if normalize_text(name)
     }
 
 
-    difficulty_name = (
-        difficulty_names.get(
-            difficulty,
-            "Intermediate"
-        )
-    )
-
-
-    return (
-
-        f"{skill_status} "
-
-        f"This course targets a "
-        f"{skill_gap:.0f}% skill gap. "
-
-        f"{success_status} "
-
-        f"Course difficulty: "
-        f"{difficulty_name}."
-
-    )
-
-
-# =========================================================
-# RECOMMEND COURSES
-# =========================================================
-
-def recommend_courses(
-    user,
-    completed_courses,
-    number_of_recommendations=5
-):
-
-    # -----------------------------------------------------
-    # Check course data
-    # -----------------------------------------------------
-
     if courses.empty:
 
-        return []
+        return completed
 
-
-    # -----------------------------------------------------
-    # Normalize completed courses
-    # -----------------------------------------------------
-
-    try:
-
-        completed_courses = [
-
-            int(course)
-
-            for course in completed_courses
-
-        ]
-
-    except (TypeError, ValueError):
-
-        completed_courses = []
-
-
-    # -----------------------------------------------------
-    # Calculate skill gaps
-    # -----------------------------------------------------
-
-    skill_gaps = calculate_skill_gap(
-        user
-    )
-
-
-    recommendations = []
-
-
-    # =====================================================
-    # EXAMINE EVERY COURSE
-    # =====================================================
 
     for _, course in courses.iterrows():
-
-        # -------------------------------------------------
-        # Course ID
-        # -------------------------------------------------
 
         try:
 
@@ -596,22 +865,579 @@ def recommend_courses(
                 course["course_id"]
             )
 
-        except (TypeError, ValueError):
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            continue
+
+
+        course_name = normalize_text(
+            course.get(
+                "course_name",
+                ""
+            )
+        )
+
+
+        if (
+            course_name
+            in normalized_names
+        ):
+
+            completed.add(
+                course_id
+            )
+
+
+    return completed
+
+
+# =========================================================
+# INFER COMPLETED FOUNDATION COURSES
+# =========================================================
+
+def infer_completed_from_skills(
+    user,
+    completed
+):
+
+    mastery = build_skill_mastery(
+        user
+    )
+
+
+    inferred = set(
+        completed
+    )
+
+
+    foundation_courses = {
+
+        "Python": 1,
+
+        "Statistics": 3,
+
+        "ML": 7,
+
+        "DL": 11,
+
+        "NLP": 15,
+
+        "Transformers": 17,
+
+        "Data Analysis": 5
+    }
+
+
+    for skill, course_id in (
+        foundation_courses.items()
+    ):
+
+        if mastery.get(
+            skill,
+            0
+        ) >= 95:
+
+            inferred.add(
+                course_id
+            )
+
+
+    return inferred
+
+
+# =========================================================
+# FUTURE RELEVANCE
+# =========================================================
+
+def future_relevance(
+    course_id,
+    goal_weights,
+    visited=None
+):
+
+    if courses.empty:
+
+        return 0.0
+
+
+    if visited is None:
+
+        visited = set()
+
+
+    if course_id in visited:
+
+        return 0.0
+
+
+    visited.add(
+        course_id
+    )
+
+
+    best = 0.0
+
+
+    for _, future_course in (
+        courses.iterrows()
+    ):
+
+        try:
+
+            future_id = int(
+                future_course.get(
+                    "course_id"
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            continue
+
+
+        required = get_prerequisite_ids(
+            future_course.get(
+                "prerequisites",
+                ""
+            )
+        )
+
+
+        if course_id not in required:
+
+            continue
+
+
+        future_skill = normalize_skill(
+            future_course.get(
+                "primary_skill",
+                ""
+            )
+        )
+
+
+        direct_score = goal_weights.get(
+            future_skill,
+            0.0
+        )
+
+
+        transitive_score = future_relevance(
+
+            future_id,
+
+            goal_weights,
+
+            visited.copy()
+
+        )
+
+
+        best = max(
+            best,
+            direct_score,
+            transitive_score
+        )
+
+
+    return best
+
+
+# =========================================================
+# INTEREST BONUS
+# =========================================================
+
+def interest_bonus(
+    skill,
+    interests
+):
+
+    text = " ".join(
+
+        normalize_text(item)
+
+        for item in (
+            interests or []
+        )
+    )
+
+
+    if skill == "NLP":
+
+        return 1.0 if (
+
+            "nlp" in text
+
+            or
+            "natural language" in text
+
+        ) else 0.0
+
+
+    if skill == "Transformers":
+
+        return 1.0 if (
+
+            "transformer" in text
+
+            or
+            "generative ai" in text
+
+            or
+            "genai" in text
+
+        ) else 0.0
+
+
+    if skill == "ML":
+
+        return 1.0 if (
+            "machine learning"
+            in text
+        ) else 0.0
+
+
+    if skill == "DL":
+
+        return 1.0 if (
+            "deep learning"
+            in text
+        ) else 0.0
+
+
+    if skill == "Data Analysis":
+
+        return 1.0 if (
+
+            "data analysis" in text
+
+            or
+            "data science" in text
+
+        ) else 0.0
+
+
+    if skill == "AI":
+
+        return 1.0 if (
+
+            "artificial intelligence"
+            in text
+
+            or
+            "generative ai"
+            in text
+
+            or
+            "genai"
+            in text
+
+        ) else 0.0
+
+
+    return 0.0
+
+
+# =========================================================
+# COURSE SCORE
+# =========================================================
+
+def calculate_course_score(
+    course,
+    user,
+    goal_weights,
+    mastery,
+    interests
+):
+
+    skill = normalize_skill(
+        course.get(
+            "primary_skill",
+            ""
+        )
+    )
+
+
+    difficulty = get_course_difficulty(
+        course
+    )
+
+
+    # -----------------------------------------------------
+    # CURRENT SKILL GAP
+    # -----------------------------------------------------
+
+    current_skill = mastery.get(
+        skill,
+        0
+    )
+
+
+    skill_gap = max(
+        0.0,
+        (
+            100.0
+            - current_skill
+        ) / 100.0
+    )
+
+
+    # -----------------------------------------------------
+    # GOAL RELEVANCE
+    # -----------------------------------------------------
+
+    goal_relevance = goal_weights.get(
+        skill,
+        0.0
+    )
+
+
+    # -----------------------------------------------------
+    # INTEREST BONUS
+    # -----------------------------------------------------
+
+    bonus = interest_bonus(
+        skill,
+        interests
+    )
+
+
+    goal_relevance = min(
+        1.0,
+        goal_relevance
+        + (
+            0.15
+            * bonus
+        )
+    )
+
+
+    # -----------------------------------------------------
+    # FUTURE RELEVANCE
+    # -----------------------------------------------------
+
+    try:
+
+        course_id = int(
+            course.get(
+                "course_id"
+            )
+        )
+
+    except (
+        TypeError,
+        ValueError
+    ):
+
+        course_id = -1
+
+
+    future_goal_relevance = future_relevance(
+
+        course_id,
+
+        goal_weights
+
+    )
+
+
+    # -----------------------------------------------------
+    # ML SUCCESS PROBABILITY
+    # -----------------------------------------------------
+
+    success_probability = predict_success(
+
+        user,
+
+        difficulty
+
+    )
+
+
+    # -----------------------------------------------------
+    # DIFFICULTY FIT
+    # -----------------------------------------------------
+
+    experience = normalize_text(
+        user.get(
+            "_experience",
+            ""
+        )
+    )
+
+
+    if "beginner" in experience:
+
+        target_difficulty = 2
+
+    elif "intermediate" in experience:
+
+        target_difficulty = 3
+
+    else:
+
+        target_difficulty = 4
+
+
+    difficulty_fit = 1 / (
+
+        1
+        +
+        abs(
+            difficulty
+            - target_difficulty
+        )
+
+    )
+
+
+    # -----------------------------------------------------
+    # FINAL SCORE
+    # -----------------------------------------------------
+
+    score = (
+
+        0.45
+        * goal_relevance
+
+        +
+
+        0.20
+        * skill_gap
+
+        +
+
+        0.15
+        * future_goal_relevance
+
+        +
+
+        0.15
+        * success_probability
+
+        +
+
+        0.05
+        * difficulty_fit
+
+    )
+
+
+    return {
+
+        "goal_relevance":
+            round(
+                goal_relevance * 100,
+                2
+            ),
+
+        "skill_gap":
+            round(
+                skill_gap * 100,
+                2
+            ),
+
+        "future_relevance":
+            round(
+                future_goal_relevance * 100,
+                2
+            ),
+
+        "predicted_success":
+            round(
+                success_probability * 100,
+                2
+            ),
+
+        "recommendation_score":
+            round(
+                score * 100,
+                2
+            )
+    }
+
+
+# =========================================================
+# BUILD CANDIDATES
+# =========================================================
+
+def build_candidates(
+    user,
+    completed_courses,
+    selected_courses,
+    goal_weights,
+    mastery,
+    interests
+):
+
+    candidates = []
+
+
+    effective_completed = set(
+        completed_courses
+    )
+
+
+    # Selected roadmap courses behave as
+    # completed for prerequisite purposes.
+
+    for course_id in (
+        selected_courses or []
+    ):
+
+        try:
+
+            effective_completed.add(
+                int(course_id)
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            pass
+
+
+    for _, course in courses.iterrows():
+
+        # -------------------------------------------------
+        # COURSE ID
+        # -------------------------------------------------
+
+        try:
+
+            course_id = int(
+                course.get(
+                    "course_id"
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
 
             continue
 
 
         # -------------------------------------------------
-        # Don't recommend completed courses
+        # SKIP COMPLETED COURSES
         # -------------------------------------------------
 
-        if course_id in completed_courses:
+        if course_id in effective_completed:
 
             continue
 
 
         # -------------------------------------------------
-        # Primary skill
+        # COURSE SKILL
         # -------------------------------------------------
 
         skill = normalize_skill(
@@ -622,94 +1448,25 @@ def recommend_courses(
         )
 
 
-        # -------------------------------------------------
-        # If the course doesn't map to one of our ML
-        # skills, skip it for this model.
-        # -------------------------------------------------
-
-        if skill not in SKILL_COLUMNS:
+        if not skill:
 
             continue
 
 
         # -------------------------------------------------
-        # Current learner skill
+        # SKIP MASTERED SKILLS
         # -------------------------------------------------
 
-        current_skill = get_skill_score(
-            user,
-            skill
-        )
-
-
-        # -------------------------------------------------
-        # Don't recommend a skill that is already mastered
-        #
-        # 80%+ = considered strong for this prototype.
-        # -------------------------------------------------
-
-        if current_skill >= 80:
+        if mastery.get(
+            skill,
+            0
+        ) >= 95:
 
             continue
 
 
         # -------------------------------------------------
-        # Skill gap
-        # -------------------------------------------------
-
-        skill_gap = max(
-            0,
-            100 - current_skill
-        )
-
-
-        # -------------------------------------------------
-        # Difficulty
-        # -------------------------------------------------
-
-        try:
-
-            difficulty = int(
-                course.get(
-                    "difficulty",
-                    3
-                )
-            )
-
-        except (TypeError, ValueError):
-
-            difficulty = 3
-
-
-        difficulty = max(
-            1,
-            min(
-                5,
-                difficulty
-            )
-        )
-
-
-        # -------------------------------------------------
-        # Estimated hours
-        # -------------------------------------------------
-
-        try:
-
-            estimated_hours = int(
-                course.get(
-                    "estimated_hours",
-                    5
-                )
-            )
-
-        except (TypeError, ValueError):
-
-            estimated_hours = 5
-
-
-        # -------------------------------------------------
-        # Check prerequisites
+        # PREREQUISITES
         # -------------------------------------------------
 
         prerequisites = course.get(
@@ -722,7 +1479,7 @@ def recommend_courses(
 
             prerequisites,
 
-            completed_courses
+            effective_completed
 
         ):
 
@@ -730,85 +1487,34 @@ def recommend_courses(
 
 
         # -------------------------------------------------
-        # Predict probability of success
+        # DIFFICULTY
         # -------------------------------------------------
 
-        success_probability = predict_success(
+        difficulty = get_course_difficulty(
+            course
+        )
+
+
+        # -------------------------------------------------
+        # SCORE
+        # -------------------------------------------------
+
+        metrics = calculate_course_score(
+
+            course,
 
             user,
 
-            difficulty
+            goal_weights,
+
+            mastery,
+
+            interests
 
         )
 
 
-        # -------------------------------------------------
-        # Convert skill gap to 0-1
-        # -------------------------------------------------
-
-        gap_score = (
-            skill_gap / 100
-        )
-
-
-        # -------------------------------------------------
-        # Difficulty score
-        #
-        # Easier courses receive a small bonus.
-        # -------------------------------------------------
-
-        difficulty_score = (
-            1 / difficulty
-        )
-
-
-        # -------------------------------------------------
-        # RECOMMENDATION SCORE
-        #
-        # 45% → Skill gap
-        # 35% → Predicted success
-        # 20% → Difficulty suitability
-        # -------------------------------------------------
-
-        recommendation_score = (
-
-            0.45 * gap_score
-
-            +
-
-            0.35 * success_probability
-
-            +
-
-            0.20 * difficulty_score
-
-        )
-
-
-        # -------------------------------------------------
-        # Generate explanation
-        # -------------------------------------------------
-
-        reason = generate_reason(
-
-            skill,
-
-            current_skill,
-
-            skill_gap,
-
-            success_probability,
-
-            difficulty
-
-        )
-
-
-        # -------------------------------------------------
-        # Store recommendation
-        # -------------------------------------------------
-
-        recommendations.append({
+        candidates.append({
 
             "course_id":
                 course_id,
@@ -828,52 +1534,558 @@ def recommend_courses(
                 difficulty,
 
             "estimated_hours":
-                estimated_hours,
+                get_course_hours(
+                    course
+                ),
 
             "skill_gap":
-                round(
-                    skill_gap,
-                    2
-                ),
+                metrics[
+                    "skill_gap"
+                ],
 
             "predicted_success":
-                round(
-                    success_probability * 100,
-                    2
-                ),
+                metrics[
+                    "predicted_success"
+                ],
 
             "recommendation_score":
-                round(
-                    recommendation_score * 100,
-                    2
-                ),
+                metrics[
+                    "recommendation_score"
+                ],
+
+            "goal_relevance":
+                metrics[
+                    "goal_relevance"
+                ],
 
             "reason":
-                reason
-
+                (
+                    "Recommended for your "
+                    "career goal."
+                )
         })
 
 
-    # =====================================================
-    # SORT BY RECOMMENDATION SCORE
-    # =====================================================
+    # -----------------------------------------------------
+    # SORT
+    # -----------------------------------------------------
 
-    recommendations.sort(
+    candidates.sort(
 
-        key=lambda item:
+        key=lambda item: (
+
             item[
                 "recommendation_score"
             ],
+
+            item[
+                "goal_relevance"
+            ],
+
+            item[
+                "predicted_success"
+            ]
+
+        ),
 
         reverse=True
 
     )
 
 
+    return candidates
+
+
+# =========================================================
+# CALCULATE SKILL GAPS
+# =========================================================
+
+def calculate_skill_gaps(
+    goal_weights,
+    mastery
+):
+
+    gaps = []
+
+
+    for skill, weight in sorted(
+
+        goal_weights.items(),
+
+        key=lambda item:
+            item[1],
+
+        reverse=True
+
+    ):
+
+        if weight < 0.40:
+
+            continue
+
+
+        if mastery.get(
+            skill,
+            0
+        ) < 95:
+
+            gaps.append(
+                skill
+            )
+
+
+    return gaps
+
+
+# =========================================================
+# CALCULATE MASTERY GAIN
+# =========================================================
+
+def calculate_mastery_gain(
+    difficulty,
+    course_name
+):
+
+    # Base gain according to difficulty.
+
+    if difficulty <= 2:
+
+        gain = 30
+
+    elif difficulty == 3:
+
+        gain = 25
+
+    elif difficulty == 4:
+
+        gain = 20
+
+    else:
+
+        gain = 15
+
+
+    # Foundational courses give a small
+    # additional mastery benefit.
+
+    normalized_name = normalize_text(
+        course_name
+    )
+
+
+    foundation_words = [
+
+        "basic",
+
+        "basics",
+
+        "fundamental",
+
+        "fundamentals",
+
+        "introduction",
+
+        "beginner"
+    ]
+
+
+    if any(
+
+        word in normalized_name
+
+        for word in foundation_words
+
+    ):
+
+        gain += 5
+
+
+    return min(
+        gain,
+        35
+    )
+
+
+# =========================================================
+# RECOMMEND COURSES
+# =========================================================
+
+def recommend_courses(
+    user,
+    completed_courses,
+    number_of_recommendations=10
+):
+
+    if courses.empty:
+
+        return []
+
+
+    goal = user.get(
+        "_goal",
+        ""
+    )
+
+
+    interests = user.get(
+        "_interests",
+        []
+    )
+
+
+    completed_names = user.get(
+        "_completed_names",
+        []
+    )
+
+
+    # -----------------------------------------------------
+    # GOAL PROFILE
+    # -----------------------------------------------------
+
+    goal_weights = get_goal_profile(
+
+        goal,
+
+        interests
+
+    )
+
+
+    # -----------------------------------------------------
+    # INITIAL MASTERY
+    # -----------------------------------------------------
+
+    mastery = build_skill_mastery(
+        user
+    )
+
+
+    # -----------------------------------------------------
+    # COMPLETED COURSES
+    # -----------------------------------------------------
+
+    completed = resolve_completed_courses(
+
+        completed_courses,
+
+        completed_names
+
+    )
+
+
+    # -----------------------------------------------------
+    # STRONG DECLARED SKILLS
+    # COUNT AS FOUNDATIONS
+    # -----------------------------------------------------
+
+    completed = infer_completed_from_skills(
+
+        user,
+
+        completed
+
+    )
+
+
+    # -----------------------------------------------------
+    # VIRTUAL MASTERY
+    #
+    # This is the critical Fix.
+    #
+    # It changes while building the roadmap,
+    # but never changes the user's actual profile.
+    # -----------------------------------------------------
+
+    virtual_mastery = dict(
+        mastery
+    )
+
+
+    roadmap = []
+
+    selected_course_ids = []
+
+    skill_counts = {}
+
+
     # =====================================================
-    # RETURN TOP N
+    # BUILD ROADMAP
     # =====================================================
 
-    return recommendations[
+    for step in range(
+        number_of_recommendations
+    ):
+
+        # -------------------------------------------------
+        # BUILD CURRENT CANDIDATES
+        # -------------------------------------------------
+
+        candidates = build_candidates(
+
+            user=user,
+
+            completed_courses=completed,
+
+            selected_courses=
+                selected_course_ids,
+
+            goal_weights=
+                goal_weights,
+
+            mastery=
+                virtual_mastery,
+
+            interests=
+                interests
+        )
+
+
+        if not candidates:
+
+            break
+
+
+        # -------------------------------------------------
+        # SELECT BEST COURSE
+        # -------------------------------------------------
+
+        selected = None
+
+
+        for candidate in candidates:
+
+            skill = candidate[
+                "skill"
+            ]
+
+
+            count = skill_counts.get(
+                skill,
+                0
+            )
+
+
+            strong_goal_skill = (
+
+                goal_weights.get(
+                    skill,
+                    0
+                ) >= 0.75
+
+            )
+
+
+            # Avoid excessive repetition.
+
+            if count >= 3:
+
+                continue
+
+
+            if (
+                count >= 2
+                and
+                not strong_goal_skill
+            ):
+
+                continue
+
+
+            selected = candidate
+
+            break
+
+
+        if selected is None:
+
+            selected = candidates[0]
+
+
+        # -------------------------------------------------
+        # COURSE INFORMATION
+        # -------------------------------------------------
+
+        skill = selected[
+            "skill"
+        ]
+
+
+        course_name = selected[
+            "course_name"
+        ]
+
+
+        difficulty = selected[
+            "difficulty"
+        ]
+
+
+        # -------------------------------------------------
+        # MASTERY BEFORE
+        # -------------------------------------------------
+
+        mastery_before = virtual_mastery.get(
+
+            skill,
+
+            0
+
+        )
+
+
+        # -------------------------------------------------
+        # MASTERY GAIN
+        # -------------------------------------------------
+
+        mastery_gain = calculate_mastery_gain(
+
+            difficulty,
+
+            course_name
+
+        )
+
+
+        # -------------------------------------------------
+        # MASTERY AFTER
+        # -------------------------------------------------
+
+        mastery_after = min(
+
+            100,
+
+            mastery_before
+            + mastery_gain
+
+        )
+
+
+        actual_gain = (
+
+            mastery_after
+            - mastery_before
+
+        )
+
+
+        # -------------------------------------------------
+        # SAVE MASTERY DATA
+        # -------------------------------------------------
+
+        selected[
+            "mastery_before"
+        ] = round(
+
+            mastery_before,
+
+            1
+
+        )
+
+
+        selected[
+            "mastery_gain"
+        ] = round(
+
+            actual_gain,
+
+            1
+
+        )
+
+
+        selected[
+            "mastery_after"
+        ] = round(
+
+            mastery_after,
+
+            1
+
+        )
+
+
+        # -------------------------------------------------
+        # CREATE REASON
+        # -------------------------------------------------
+
+        selected[
+            "reason"
+        ] = (
+
+            f"Recommended for your "
+            f"career goal. Your "
+            f"{skill} mastery was "
+            f"{mastery_before:.0f}% "
+            f"before this course. "
+            f"Completing this course "
+            f"is estimated to increase "
+            f"your {skill} mastery by "
+            f"{actual_gain:.0f} percentage "
+            f"points, reaching "
+            f"approximately "
+            f"{mastery_after:.0f}%. "
+            f"Predicted success "
+            f"probability: "
+            f"{selected['predicted_success']:.2f}%."
+        )
+
+
+        # -------------------------------------------------
+        # UPDATE VIRTUAL MASTERY
+        # -------------------------------------------------
+
+        virtual_mastery[
+            skill
+        ] = mastery_after
+
+
+        # -------------------------------------------------
+        # ADD TO ROADMAP
+        # -------------------------------------------------
+
+        roadmap.append(
+            selected
+        )
+
+
+        selected_course_ids.append(
+
+            selected[
+                "course_id"
+            ]
+
+        )
+
+
+        # -------------------------------------------------
+        # UPDATE SKILL COUNT
+        # -------------------------------------------------
+
+        skill_counts[
+            skill
+        ] = (
+
+            skill_counts.get(
+                skill,
+                0
+            )
+
+            + 1
+
+        )
+
+
+        print(
+            f"Step {step + 1}: "
+            f"{course_name} | "
+            f"{skill}: "
+            f"{mastery_before:.0f}% -> "
+            f"{mastery_after:.0f}%"
+        )
+
+
+    return roadmap[
         :number_of_recommendations
     ]
