@@ -7,10 +7,6 @@ const BACKEND_URL =
     "http://127.0.0.1:8000";
 
 
-// ============================================================
-// START
-// ============================================================
-
 document.addEventListener(
     "DOMContentLoaded",
     loadDashboard
@@ -69,16 +65,12 @@ async function loadDashboard() {
 
 
     // ---------------------------------------------------------
-    // GET RECOMMENDATION FOR THIS PROFILE
+    // GET RECOMMENDATION
     // ---------------------------------------------------------
 
     let recommendation =
         profile.recommendation;
 
-
-    // ---------------------------------------------------------
-    // If recommendation is missing, generate it
-    // ---------------------------------------------------------
 
     if (
         !recommendation ||
@@ -93,11 +85,18 @@ async function loadDashboard() {
                 );
 
 
-            // Save only to THIS profile
             updateSelectedProfile({
-                recommendation
-            });
 
+                recommendation,
+
+                totalRoadmapCourses:
+                    Array.isArray(
+                        recommendation.learning_path
+                    )
+                        ? recommendation.learning_path.length
+                        : 0
+
+            });
 
         } catch (error) {
 
@@ -111,10 +110,6 @@ async function loadDashboard() {
         }
     }
 
-
-    // ---------------------------------------------------------
-    // If still unavailable
-    // ---------------------------------------------------------
 
     if (!recommendation) {
 
@@ -141,23 +136,6 @@ async function loadDashboard() {
 
 
     // ---------------------------------------------------------
-    // AVAILABLE COURSES
-    // ---------------------------------------------------------
-
-    const availableCourses =
-        document.getElementById(
-            "availableCourses"
-        );
-
-
-    if (availableCourses) {
-
-        availableCourses.textContent =
-            learningPath.length;
-    }
-
-
-    // ---------------------------------------------------------
     // COMPLETED COURSES
     // ---------------------------------------------------------
 
@@ -177,6 +155,47 @@ async function loadDashboard() {
 
         completedElement.textContent =
             completedCourses.length;
+    }
+
+
+    // ---------------------------------------------------------
+    // TOTAL ROADMAP COURSES
+    // ---------------------------------------------------------
+
+    const totalRoadmapCourses =
+        Number(
+            profile.totalRoadmapCourses
+        ) > 0
+
+            ? Number(
+                profile.totalRoadmapCourses
+            )
+
+            : learningPath.length;
+
+
+    // ---------------------------------------------------------
+    // AVAILABLE / REMAINING COURSES
+    // ---------------------------------------------------------
+
+    const availableCourses =
+        document.getElementById(
+            "availableCourses"
+        );
+
+
+    const remainingCourses =
+        Math.max(
+            0,
+            totalRoadmapCourses -
+            completedCourses.length
+        );
+
+
+    if (availableCourses) {
+
+        availableCourses.textContent =
+            remainingCourses;
     }
 
 
@@ -212,19 +231,40 @@ async function loadDashboard() {
 
 
     // ---------------------------------------------------------
-    // READINESS
+    // OVERALL COURSE PROGRESS
+    //
+    // Overall Progress is based on actual completed
+    // roadmap courses, not goal readiness.
     // ---------------------------------------------------------
 
-    const readiness =
-        calculateReadiness(
-            recommendation,
-            currentSkills,
-            skillGaps
+    let overallProgress =
+        0;
+
+
+    if (
+        totalRoadmapCourses > 0
+    ) {
+
+        overallProgress =
+            Math.round(
+                (
+                    completedCourses.length /
+                    totalRoadmapCourses
+                ) * 100
+            );
+    }
+
+
+    overallProgress =
+        clamp(
+            overallProgress,
+            0,
+            100
         );
 
 
     updateProgress(
-        readiness
+        overallProgress
     );
 
 
@@ -237,8 +277,36 @@ async function loadDashboard() {
     );
 
 
+    // ---------------------------------------------------------
+    // DEBUG
+    // ---------------------------------------------------------
+
     console.log(
         "Dashboard loaded successfully."
+    );
+
+
+    console.log(
+        "Completed courses:",
+        completedCourses.length
+    );
+
+
+    console.log(
+        "Total roadmap courses:",
+        totalRoadmapCourses
+    );
+
+
+    console.log(
+        "Available courses:",
+        remainingCourses
+    );
+
+
+    console.log(
+        "Overall progress:",
+        `${overallProgress}%`
     );
 }
 
@@ -275,13 +343,16 @@ function getSelectedProfile() {
 
 
             if (
-                Array.isArray(profiles)
+                Array.isArray(
+                    profiles
+                )
             ) {
 
                 const selected =
                     profiles.find(
                         profile =>
-                            profile.id === selectedId
+                            profile.id ===
+                            selectedId
                     );
 
 
@@ -361,7 +432,9 @@ function updateSelectedProfile(
 
 
         if (
-            !Array.isArray(profiles)
+            !Array.isArray(
+                profiles
+            )
         ) {
 
             return;
@@ -371,7 +444,8 @@ function updateSelectedProfile(
         const index =
             profiles.findIndex(
                 profile =>
-                    profile.id === selectedId
+                    profile.id ===
+                    selectedId
             );
 
 
@@ -382,8 +456,11 @@ function updateSelectedProfile(
 
 
         profiles[index] = {
+
             ...profiles[index],
+
             ...updates
+
         };
 
 
@@ -402,7 +479,6 @@ function updateSelectedProfile(
                 profiles[index]
             )
         );
-
 
     } catch (error) {
 
@@ -552,12 +628,12 @@ function updateStudyTime(
     const studyTime =
         profile.study_time ||
         profile.studyTime ||
+        profile.hours_per_week ||
+        profile.hoursPerWeek ||
         profile.hours_per_day ||
         profile.hoursPerDay ||
         profile.daily_hours ||
-        profile.dailyHours ||
-        profile.hours_per_week ||
-        profile.hoursPerWeek;
+        profile.dailyHours;
 
 
     if (
@@ -585,7 +661,7 @@ function updateStudyTime(
 
 
     element.textContent =
-        `${studyTime} hours/day`;
+        `${studyTime} hours/week`;
 }
 
 
@@ -620,6 +696,10 @@ function getCompletedCourses(
     profile
 ) {
 
+    // ---------------------------------------------------------
+    // CURRENT MULTI-PROFILE SOURCE
+    // ---------------------------------------------------------
+
     if (
         profile &&
         Array.isArray(
@@ -630,6 +710,10 @@ function getCompletedCourses(
         return profile.completed;
     }
 
+
+    // ---------------------------------------------------------
+    // ALTERNATIVE PROFILE FIELD
+    // ---------------------------------------------------------
 
     if (
         profile &&
@@ -642,7 +726,10 @@ function getCompletedCourses(
     }
 
 
-    // Old storage fallback
+    // ---------------------------------------------------------
+    // LEGACY STORAGE FALLBACK
+    // ---------------------------------------------------------
+
     try {
 
         const value =
@@ -669,7 +756,13 @@ function getCompletedCourses(
             ? courses
             : [];
 
+
     } catch (error) {
+
+        console.error(
+            "Could not read completed courses:",
+            error
+        );
 
         return [];
     }
@@ -685,7 +778,7 @@ function getCurrentSkills(
     profile
 ) {
 
-    // Backend response first
+    // Backend response
     if (
         recommendation &&
         Array.isArray(
@@ -699,7 +792,6 @@ function getCurrentSkills(
     }
 
 
-    // Profile skills
     const fields = [
 
         "skills",
@@ -715,6 +807,7 @@ function getCurrentSkills(
         "technical_skills",
 
         "technicalSkills"
+
     ];
 
 
@@ -727,7 +820,9 @@ function getCurrentSkills(
 
 
         if (
-            Array.isArray(value)
+            Array.isArray(
+                value
+            )
         ) {
 
             return uniqueSkills(
@@ -808,11 +903,17 @@ function extractSkillName(
     ) {
 
         return (
+
             skill.name ||
+
             skill.skill ||
+
             skill.title ||
+
             skill.label ||
+
             ""
+
         );
     }
 
@@ -829,14 +930,17 @@ function uniqueSkills(
     skills
 ) {
 
-    const result = [];
+    const result =
+        [];
 
     const seen =
         new Set();
 
 
     if (
-        !Array.isArray(skills)
+        !Array.isArray(
+            skills
+        )
     ) {
 
         return result;
@@ -885,17 +989,16 @@ function uniqueSkills(
 // ============================================================
 // CALCULATE READINESS
 // ============================================================
+//
+// Kept for compatibility.
+// This is GOAL READINESS, not overall course progress.
+// ============================================================
 
 function calculateReadiness(
     recommendation,
     currentSkills,
     skillGaps
 ) {
-
-    // ---------------------------------------------------------
-    // IMPORTANT:
-    // Backend readiness is the preferred value.
-    // ---------------------------------------------------------
 
     if (
         recommendation &&
@@ -917,10 +1020,6 @@ function calculateReadiness(
         );
     }
 
-
-    // ---------------------------------------------------------
-    // Fallback calculation
-    // ---------------------------------------------------------
 
     const existing =
         new Set(
@@ -960,20 +1059,26 @@ function calculateReadiness(
 
 
     return clamp(
+
         Math.round(
+
             (
                 existing.size /
                 total
             ) * 100
+
         ),
+
         0,
+
         100
+
     );
 }
 
 
 // ============================================================
-// UPDATE PROGRESS
+// UPDATE OVERALL PROGRESS
 // ============================================================
 
 function updateProgress(
@@ -1061,17 +1166,15 @@ function updateSkillChart(
     }
 
 
-    chart.innerHTML = "";
+    chart.innerHTML =
+        "";
 
 
     const skillMap =
         new Map();
 
 
-    // ---------------------------------------------------------
     // Current skills
-    // ---------------------------------------------------------
-
     currentSkills.forEach(
         skill => {
 
@@ -1095,10 +1198,7 @@ function updateSkillChart(
     );
 
 
-    // ---------------------------------------------------------
     // Skill gaps
-    // ---------------------------------------------------------
-
     skillGaps.forEach(
         skill => {
 
@@ -1140,9 +1240,13 @@ function updateSkillChart(
     ) {
 
         chart.innerHTML = `
+
             <p style="opacity:0.7;">
+
                 No skill information available.
+
             </p>
+
         `;
 
         return;
@@ -1340,9 +1444,13 @@ function updateEmptyDashboard() {
     if (chart) {
 
         chart.innerHTML = `
+
             <p style="opacity:0.7;">
+
                 No recommendation data available.
+
             </p>
+
         `;
     }
 
