@@ -1,11 +1,15 @@
-/* =========================================================
-   LEARNPATH AI - DASHBOARD
-   ML CONNECTED VERSION
-   ========================================================= */
+// ============================================================
+// LEARNPATH AI - DASHBOARD
+// MULTI-PROFILE + ML CONNECTED VERSION
+// ============================================================
 
 const BACKEND_URL =
     "http://127.0.0.1:8000";
 
+
+// ============================================================
+// START
+// ============================================================
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -13,140 +17,132 @@ document.addEventListener(
 );
 
 
-/* =========================================================
-   LOAD DASHBOARD
-   ========================================================= */
+// ============================================================
+// LOAD DASHBOARD
+// ============================================================
 
 async function loadDashboard() {
 
     console.log(
-        "Loading ML-powered dashboard..."
+        "Loading selected learning profile..."
     );
 
 
-    // -----------------------------------------------------
-    // PROFILE
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
+    // GET SELECTED PROFILE
+    // ---------------------------------------------------------
 
     const profile =
-        getObject(
-            "learnPathProfile"
-        );
+        getSelectedProfile();
 
 
-    // -----------------------------------------------------
-    // COMPLETED COURSES
-    // -----------------------------------------------------
+    if (!profile) {
 
-    const completedCourses =
-        getCompletedCourses();
+        showDefaultDashboard();
+
+        return;
+    }
 
 
     console.log(
-        "Profile:",
+        "Selected profile:",
         profile
     );
 
 
-    console.log(
-        "Completed Courses:",
-        completedCourses
-    );
-
-
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // USER NAME
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     updateUserName(
         profile
     );
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // STUDY TIME
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     updateStudyTime(
         profile
     );
 
 
-    // -----------------------------------------------------
-    // GET FRESH ML RECOMMENDATION
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
+    // GET RECOMMENDATION FOR THIS PROFILE
+    // ---------------------------------------------------------
 
-    let recommendation;
-
-
-    try {
-
-        recommendation =
-            await fetchRecommendation(
-                profile
-            );
+    let recommendation =
+        profile.recommendation;
 
 
-        console.log(
-            "Fresh ML Recommendation:",
-            recommendation
-        );
+    // ---------------------------------------------------------
+    // If recommendation is missing, generate it
+    // ---------------------------------------------------------
+
+    if (
+        !recommendation ||
+        typeof recommendation !== "object"
+    ) {
+
+        try {
+
+            recommendation =
+                await fetchRecommendation(
+                    profile
+                );
 
 
-        // Save latest ML response
-
-        localStorage.setItem(
-
-            "recommendation",
-
-            JSON.stringify(
+            // Save only to THIS profile
+            updateSelectedProfile({
                 recommendation
-            )
-
-        );
+            });
 
 
-    } catch (error) {
+        } catch (error) {
 
-        console.error(
-            "ML recommendation failed:",
-            error
-        );
-
-
-        // Fallback to old cached result
-
-        recommendation =
-            getObject(
-                "recommendation"
+            console.error(
+                "ML recommendation failed:",
+                error
             );
 
 
-        console.warn(
-            "Using cached recommendation."
-        );
-
+            recommendation = null;
+        }
     }
 
 
-    // -----------------------------------------------------
-    // GOAL
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
+    // If still unavailable
+    // ---------------------------------------------------------
 
-    updateGoal(
+    if (!recommendation) {
+
+        updateEmptyDashboard();
+
+        return;
+    }
+
+
+    console.log(
+        "Recommendation for selected profile:",
         recommendation
     );
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // LEARNING PATH
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     const learningPath =
         getLearningPath(
             recommendation
         );
 
+
+    // ---------------------------------------------------------
+    // AVAILABLE COURSES
+    // ---------------------------------------------------------
 
     const availableCourses =
         document.getElementById(
@@ -158,13 +154,18 @@ async function loadDashboard() {
 
         availableCourses.textContent =
             learningPath.length;
-
     }
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // COMPLETED COURSES
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
+
+    const completedCourses =
+        getCompletedCourses(
+            profile
+        );
+
 
     const completedElement =
         document.getElementById(
@@ -176,23 +177,23 @@ async function loadDashboard() {
 
         completedElement.textContent =
             completedCourses.length;
-
     }
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // CURRENT SKILLS
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     const currentSkills =
         getCurrentSkills(
+            recommendation,
             profile
         );
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // SKILL GAPS
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     const skillGaps =
         getSkillGaps(
@@ -200,30 +201,25 @@ async function loadDashboard() {
         );
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // SKILL CHART
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     updateSkillChart(
-
         currentSkills,
-
         skillGaps
-
     );
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // READINESS
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     const readiness =
         calculateReadiness(
-
+            recommendation,
             currentSkills,
-
             skillGaps
-
         );
 
 
@@ -232,9 +228,9 @@ async function loadDashboard() {
     );
 
 
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
     // COMPLETED LEARNING
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
 
     updateCompletedLearning(
         completedCourses
@@ -244,13 +240,183 @@ async function loadDashboard() {
     console.log(
         "Dashboard loaded successfully."
     );
-
 }
 
 
-/* =========================================================
-   FETCH RECOMMENDATION FROM FASTAPI + ML
-   ========================================================= */
+// ============================================================
+// GET SELECTED PROFILE
+// ============================================================
+
+function getSelectedProfile() {
+
+    try {
+
+        const profilesRaw =
+            localStorage.getItem(
+                "learnPathProfiles"
+            );
+
+
+        const selectedId =
+            localStorage.getItem(
+                "selectedProfileId"
+            );
+
+
+        if (
+            profilesRaw &&
+            selectedId
+        ) {
+
+            const profiles =
+                JSON.parse(
+                    profilesRaw
+                );
+
+
+            if (
+                Array.isArray(profiles)
+            ) {
+
+                const selected =
+                    profiles.find(
+                        profile =>
+                            profile.id === selectedId
+                    );
+
+
+                if (selected) {
+
+                    return selected;
+                }
+            }
+        }
+
+
+        // -----------------------------------------------------
+        // Backward compatibility
+        // -----------------------------------------------------
+
+        const oldProfile =
+            localStorage.getItem(
+                "learnPathProfile"
+            );
+
+
+        if (oldProfile) {
+
+            return JSON.parse(
+                oldProfile
+            );
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Unable to read selected profile:",
+            error
+        );
+    }
+
+
+    return null;
+}
+
+
+// ============================================================
+// UPDATE SELECTED PROFILE
+// ============================================================
+
+function updateSelectedProfile(
+    updates
+) {
+
+    try {
+
+        const profilesRaw =
+            localStorage.getItem(
+                "learnPathProfiles"
+            );
+
+
+        const selectedId =
+            localStorage.getItem(
+                "selectedProfileId"
+            );
+
+
+        if (
+            !profilesRaw ||
+            !selectedId
+        ) {
+
+            return;
+        }
+
+
+        const profiles =
+            JSON.parse(
+                profilesRaw
+            );
+
+
+        if (
+            !Array.isArray(profiles)
+        ) {
+
+            return;
+        }
+
+
+        const index =
+            profiles.findIndex(
+                profile =>
+                    profile.id === selectedId
+            );
+
+
+        if (index === -1) {
+
+            return;
+        }
+
+
+        profiles[index] = {
+            ...profiles[index],
+            ...updates
+        };
+
+
+        localStorage.setItem(
+            "learnPathProfiles",
+            JSON.stringify(
+                profiles
+            )
+        );
+
+
+        // Backward compatibility
+        localStorage.setItem(
+            "learnPathProfile",
+            JSON.stringify(
+                profiles[index]
+            )
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Unable to update profile:",
+            error
+        );
+    }
+}
+
+
+// ============================================================
+// FETCH RECOMMENDATION
+// ============================================================
 
 async function fetchRecommendation(
     profile
@@ -264,38 +430,25 @@ async function fetchRecommendation(
         throw new Error(
             "Learner profile is empty."
         );
-
     }
-
-
-    console.log(
-        "Sending profile to ML backend..."
-    );
 
 
     const response =
         await fetch(
-
             `${BACKEND_URL}/recommend`,
-
             {
-
                 method: "POST",
 
                 headers: {
-
                     "Content-Type":
                         "application/json"
-
                 },
 
                 body:
                     JSON.stringify(
                         profile
                     )
-
             }
-
         );
 
 
@@ -306,157 +459,41 @@ async function fetchRecommendation(
 
 
         throw new Error(
-
             `Backend returned ${response.status}: ${errorText}`
-
         );
-
     }
 
 
     return await response.json();
-
 }
 
 
-/* =========================================================
-   LOCAL STORAGE
-   ========================================================= */
-
-function getObject(
-    key
-) {
-
-    try {
-
-        const value =
-            localStorage.getItem(
-                key
-            );
-
-
-        if (!value) {
-
-            return {};
-
-        }
-
-
-        return JSON.parse(
-            value
-        );
-
-
-    } catch (error) {
-
-        console.error(
-
-            `Unable to read ${key}:`,
-
-            error
-
-        );
-
-
-        return {};
-
-    }
-
-}
-
-
-/* =========================================================
-   COMPLETED COURSES
-   ========================================================= */
-
-function getCompletedCourses() {
-
-    try {
-
-        const value =
-            localStorage.getItem(
-                "completedCourses"
-            );
-
-
-        if (!value) {
-
-            return [];
-
-        }
-
-
-        const courses =
-            JSON.parse(
-                value
-            );
-
-
-        return Array.isArray(
-            courses
-        )
-
-            ? courses
-
-            : [];
-
-
-    } catch (error) {
-
-        console.error(
-
-            "Unable to read completedCourses:",
-
-            error
-
-        );
-
-
-        return [];
-
-    }
-
-}
-
-
-/* =========================================================
-   USER NAME
-   ========================================================= */
+// ============================================================
+// USER NAME
+// ============================================================
 
 function updateUserName(
     profile
 ) {
 
-    const element =
+    const nameElement =
         document.getElementById(
-            "welcomeUser"
+            "topNavName"
         );
 
 
-    if (!element) {
-
-        return;
-
-    }
+    const welcomeElement =
+        document.getElementById(
+            "welcomeMessage"
+        );
 
 
     let name =
-
-        profile.name
-        ||
-
-        profile.full_name
-        ||
-
-        profile.fullName
-        ||
-
-        profile.username
-        ||
-
-        profile.userName
-        ||
-
+        profile.name ||
+        profile.full_name ||
+        profile.fullName ||
+        profile.username ||
+        profile.userName ||
         profile.student_name;
 
 
@@ -466,56 +503,35 @@ function updateUserName(
     ) {
 
         name =
-
-            profile.user.name
-            ||
-
-            profile.user.full_name
-            ||
-
+            profile.user.name ||
+            profile.user.full_name ||
             profile.user.username;
-
     }
 
 
-    if (name) {
+    name =
+        name ||
+        "Student";
 
-        element.textContent =
-            `Welcome, ${name} 👋`;
 
-    } else {
+    if (nameElement) {
 
-        element.textContent =
-            "Welcome 👋";
-
+        nameElement.textContent =
+            name;
     }
 
+
+    if (welcomeElement) {
+
+        welcomeElement.textContent =
+            `Welcome back, ${name}! 👋`;
+    }
 }
 
 
-/* =========================================================
-   GOAL
-   ========================================================= */
-
-function updateGoal(
-    recommendation
-) {
-
-    const goal =
-        recommendation.goal;
-
-
-    console.log(
-        "Career Goal:",
-        goal
-    );
-
-}
-
-
-/* =========================================================
-   STUDY TIME
-   ========================================================= */
+// ============================================================
+// STUDY TIME
+// ============================================================
 
 function updateStudyTime(
     profile
@@ -530,54 +546,30 @@ function updateStudyTime(
     if (!element) {
 
         return;
-
     }
 
 
-    let studyTime =
-
-        profile.study_time
-        ||
-
-        profile.studyTime
-        ||
-
-        profile.hours_per_day
-        ||
-
-        profile.hoursPerDay
-        ||
-
-        profile.daily_hours
-        ||
-
-        profile.dailyHours
-        ||
-
-        profile.hours_per_week
-        ||
-
+    const studyTime =
+        profile.study_time ||
+        profile.studyTime ||
+        profile.hours_per_day ||
+        profile.hoursPerDay ||
+        profile.daily_hours ||
+        profile.dailyHours ||
+        profile.hours_per_week ||
         profile.hoursPerWeek;
 
 
     if (
-
-        studyTime === undefined
-        ||
-
-        studyTime === null
-        ||
-
+        studyTime === undefined ||
+        studyTime === null ||
         studyTime === ""
-
     ) {
 
         element.textContent =
             "Not set";
 
-
         return;
-
     }
 
 
@@ -588,63 +580,127 @@ function updateStudyTime(
         element.textContent =
             studyTime;
 
-
         return;
-
     }
 
 
     element.textContent =
         `${studyTime} hours/day`;
-
 }
 
 
-/* =========================================================
-   LEARNING PATH
-   ========================================================= */
+// ============================================================
+// LEARNING PATH
+// ============================================================
 
 function getLearningPath(
     recommendation
 ) {
 
     if (
-
-        !recommendation
-        ||
-
+        !recommendation ||
         !Array.isArray(
             recommendation.learning_path
         )
-
     ) {
 
         return [];
-
     }
 
 
     return recommendation.learning_path;
-
 }
 
 
-/* =========================================================
-   CURRENT SKILLS
-   ========================================================= */
+// ============================================================
+// COMPLETED COURSES
+// ============================================================
 
-function getCurrentSkills(
+function getCompletedCourses(
     profile
 ) {
 
-    if (!profile) {
+    if (
+        profile &&
+        Array.isArray(
+            profile.completed
+        )
+    ) {
 
-        return [];
-
+        return profile.completed;
     }
 
 
-    const possibleFields = [
+    if (
+        profile &&
+        Array.isArray(
+            profile.completedCourses
+        )
+    ) {
+
+        return profile.completedCourses;
+    }
+
+
+    // Old storage fallback
+    try {
+
+        const value =
+            localStorage.getItem(
+                "completedCourses"
+            );
+
+
+        if (!value) {
+
+            return [];
+        }
+
+
+        const courses =
+            JSON.parse(
+                value
+            );
+
+
+        return Array.isArray(
+            courses
+        )
+            ? courses
+            : [];
+
+    } catch (error) {
+
+        return [];
+    }
+}
+
+
+// ============================================================
+// CURRENT SKILLS
+// ============================================================
+
+function getCurrentSkills(
+    recommendation,
+    profile
+) {
+
+    // Backend response first
+    if (
+        recommendation &&
+        Array.isArray(
+            recommendation.current_skills
+        )
+    ) {
+
+        return uniqueSkills(
+            recommendation.current_skills
+        );
+    }
+
+
+    // Profile skills
+    const fields = [
 
         "skills",
 
@@ -659,12 +715,11 @@ function getCurrentSkills(
         "technical_skills",
 
         "technicalSkills"
-
     ];
 
 
     for (
-        const field of possibleFields
+        const field of fields
     ) {
 
         const value =
@@ -675,16 +730,13 @@ function getCurrentSkills(
             Array.isArray(value)
         ) {
 
-            return value
-
-                .map(
-                    extractSkillName
-                )
-
-                .filter(
-                    Boolean
-                );
-
+            return uniqueSkills(
+                value
+                    .map(
+                        extractSkillName
+                    )
+                    .filter(Boolean)
+            );
         }
 
 
@@ -692,69 +744,51 @@ function getCurrentSkills(
             typeof value === "string"
         ) {
 
-            return value
-
-                .split(",")
-
-                .map(
-                    skill =>
-                        skill.trim()
-                )
-
-                .filter(
-                    Boolean
-                );
-
+            return uniqueSkills(
+                value
+                    .split(",")
+                    .map(
+                        skill =>
+                            skill.trim()
+                    )
+                    .filter(Boolean)
+            );
         }
-
     }
 
 
     return [];
-
 }
 
 
-/* =========================================================
-   SKILL GAPS
-   ========================================================= */
+// ============================================================
+// SKILL GAPS
+// ============================================================
 
 function getSkillGaps(
     recommendation
 ) {
 
     if (
-
-        !recommendation
-        ||
-
+        !recommendation ||
         !Array.isArray(
             recommendation.skill_gaps
         )
-
     ) {
 
         return [];
-
     }
 
 
-    return recommendation.skill_gaps
-
-        .map(
-            extractSkillName
-        )
-
-        .filter(
-            Boolean
-        );
-
+    return uniqueSkills(
+        recommendation.skill_gaps
+    );
 }
 
 
-/* =========================================================
-   EXTRACT SKILL NAME
-   ========================================================= */
+// ============================================================
+// EXTRACT SKILL NAME
+// ============================================================
 
 function extractSkillName(
     skill
@@ -765,100 +799,155 @@ function extractSkillName(
     ) {
 
         return skill.trim();
-
     }
 
 
     if (
-
+        skill &&
         typeof skill === "object"
-        &&
-        skill !== null
-
     ) {
 
         return (
-
-            skill.name
-            ||
-
-            skill.skill
-            ||
-
-            skill.title
-            ||
-
-            skill.label
-            ||
-
+            skill.name ||
+            skill.skill ||
+            skill.title ||
+            skill.label ||
             ""
-
         );
-
     }
 
 
     return "";
-
 }
 
 
-/* =========================================================
-   NORMALIZE SKILL
-   ========================================================= */
+// ============================================================
+// UNIQUE SKILLS
+// ============================================================
 
-function normalizeSkill(
-    skill
+function uniqueSkills(
+    skills
 ) {
 
-    return String(skill)
+    const result = [];
 
-        .trim()
+    const seen =
+        new Set();
 
-        .toLowerCase();
 
+    if (
+        !Array.isArray(skills)
+    ) {
+
+        return result;
+    }
+
+
+    skills.forEach(
+        skill => {
+
+            const name =
+                extractSkillName(
+                    skill
+                );
+
+
+            const normalized =
+                name
+                    .trim()
+                    .toLowerCase();
+
+
+            if (
+                normalized &&
+                !seen.has(
+                    normalized
+                )
+            ) {
+
+                seen.add(
+                    normalized
+                );
+
+
+                result.push(
+                    name
+                );
+            }
+        }
+    );
+
+
+    return result;
 }
 
 
-/* =========================================================
-   CALCULATE READINESS
-   ========================================================= */
+// ============================================================
+// CALCULATE READINESS
+// ============================================================
 
 function calculateReadiness(
-
+    recommendation,
     currentSkills,
-
     skillGaps
-
 ) {
+
+    // ---------------------------------------------------------
+    // IMPORTANT:
+    // Backend readiness is the preferred value.
+    // ---------------------------------------------------------
+
+    if (
+        recommendation &&
+        Number.isFinite(
+            Number(
+                recommendation
+                    .readiness_percentage
+            )
+        )
+    ) {
+
+        return clamp(
+            Number(
+                recommendation
+                    .readiness_percentage
+            ),
+            0,
+            100
+        );
+    }
+
+
+    // ---------------------------------------------------------
+    // Fallback calculation
+    // ---------------------------------------------------------
 
     const existing =
         new Set(
-
             currentSkills.map(
-                normalizeSkill
+                skill =>
+                    skill
+                        .trim()
+                        .toLowerCase()
             )
-
         );
 
 
     const gaps =
         new Set(
-
             skillGaps.map(
-                normalizeSkill
+                skill =>
+                    skill
+                        .trim()
+                        .toLowerCase()
             )
-
         );
 
 
     const total =
         new Set([
-
             ...existing,
-
             ...gaps
-
         ]).size;
 
 
@@ -867,39 +956,25 @@ function calculateReadiness(
     ) {
 
         return 0;
-
     }
 
 
-    const readiness =
+    return clamp(
         Math.round(
-
             (
-                existing.size
-                /
+                existing.size /
                 total
             ) * 100
-
-        );
-
-
-    return Math.min(
-
-        100,
-
-        Math.max(
-            0,
-            readiness
-        )
-
+        ),
+        0,
+        100
     );
-
 }
 
 
-/* =========================================================
-   UPDATE OVERALL PROGRESS
-   ========================================================= */
+// ============================================================
+// UPDATE PROGRESS
+// ============================================================
 
 function updateProgress(
     percentage
@@ -921,7 +996,6 @@ function updateProgress(
 
         progress.textContent =
             `${percentage}%`;
-
     }
 
 
@@ -929,20 +1003,18 @@ function updateProgress(
 
         donutPercentage.textContent =
             `${percentage}%`;
-
     }
 
 
     updateDonut(
         percentage
     );
-
 }
 
 
-/* =========================================================
-   DONUT
-   ========================================================= */
+// ============================================================
+// DONUT
+// ============================================================
 
 function updateDonut(
     percentage
@@ -957,30 +1029,24 @@ function updateDonut(
     if (!donut) {
 
         return;
-
     }
 
 
     donut.style.background =
-
         `conic-gradient(
             #ff5c7a 0% ${percentage}%,
             #20273f ${percentage}% 100%
         )`;
-
 }
 
 
-/* =========================================================
-   SKILL CHART
-   ========================================================= */
+// ============================================================
+// SKILL CHART
+// ============================================================
 
 function updateSkillChart(
-
     currentSkills,
-
     skillGaps
-
 ) {
 
     const chart =
@@ -992,7 +1058,6 @@ function updateSkillChart(
     if (!chart) {
 
         return;
-
     }
 
 
@@ -1003,77 +1068,64 @@ function updateSkillChart(
         new Map();
 
 
-    // -----------------------------------------------------
-    // CURRENT SKILLS
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
+    // Current skills
+    // ---------------------------------------------------------
 
     currentSkills.forEach(
         skill => {
 
             const key =
-                normalizeSkill(
-                    skill
-                );
+                skill
+                    .trim()
+                    .toLowerCase();
 
 
             skillMap.set(
-
                 key,
-
                 {
-
                     name:
                         skill,
 
                     percentage:
                         90
-
                 }
-
             );
-
         }
-
     );
 
 
-    // -----------------------------------------------------
-    // SKILL GAPS
-    // -----------------------------------------------------
+    // ---------------------------------------------------------
+    // Skill gaps
+    // ---------------------------------------------------------
 
     skillGaps.forEach(
         skill => {
 
             const key =
-                normalizeSkill(
-                    skill
-                );
+                skill
+                    .trim()
+                    .toLowerCase();
 
 
             if (
-                !skillMap.has(key)
+                !skillMap.has(
+                    key
+                )
             ) {
 
                 skillMap.set(
-
                     key,
-
                     {
-
                         name:
                             skill,
 
                         percentage:
                             30
-
                     }
-
                 );
-
             }
-
         }
-
     );
 
 
@@ -1088,16 +1140,12 @@ function updateSkillChart(
     ) {
 
         chart.innerHTML = `
-
             <p style="opacity:0.7;">
                 No skill information available.
             </p>
-
         `;
 
-
         return;
-
     }
 
 
@@ -1105,34 +1153,23 @@ function updateSkillChart(
         skill => {
 
             createSkillBar(
-
                 chart,
-
                 skill.name,
-
                 skill.percentage
-
             );
-
         }
-
     );
-
 }
 
 
-/* =========================================================
-   CREATE SKILL BAR
-   ========================================================= */
+// ============================================================
+// CREATE SKILL BAR
+// ============================================================
 
 function createSkillBar(
-
     chart,
-
     name,
-
     percentage
-
 ) {
 
     const container =
@@ -1151,6 +1188,14 @@ function createSkillBar(
         document.createElement(
             "label"
         );
+
+
+    container.style.position =
+        "relative";
+
+
+    container.style.height =
+        "100px";
 
 
     bar.style.height =
@@ -1178,13 +1223,12 @@ function createSkillBar(
     chart.appendChild(
         container
     );
-
 }
 
 
-/* =========================================================
-   COMPLETED LEARNING
-   ========================================================= */
+// ============================================================
+// COMPLETED LEARNING
+// ============================================================
 
 function updateCompletedLearning(
     completedCourses
@@ -1196,23 +1240,9 @@ function updateCompletedLearning(
         );
 
 
-    const list =
-        document.getElementById(
-            "completedList"
-        );
-
-
     if (!message) {
 
         return;
-
-    }
-
-
-    if (list) {
-
-        list.innerHTML = "";
-
     }
 
 
@@ -1223,151 +1253,184 @@ function updateCompletedLearning(
         message.textContent =
             "No completed courses yet. Start your roadmap to see progress here.";
 
-
         return;
-
     }
 
 
-    message.textContent =
+    const names =
+        completedCourses
+            .map(
+                course => {
 
-        `You have completed ${
-            completedCourses.length
-        } course${
-            completedCourses.length === 1
-                ? ""
-                : "s"
-        }. Great work! 🎉`;
+                    if (
+                        typeof course === "string"
+                    ) {
 
-
-    if (!list) {
-
-        return;
-
-    }
+                        return course;
+                    }
 
 
-    completedCourses.forEach(
-        course => {
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-
-            item.className =
-                "completed-course";
-
-
-            let name;
-
-
-            if (
-                typeof course === "string"
-            ) {
-
-                name = course;
-
-            }
-
-            else if (
-
-                typeof course === "object"
-                &&
-                course !== null
-
-            ) {
-
-                name =
-
-                    course.title
-                    ||
-
-                    course.name
-                    ||
-
-                    course.course
-                    ||
-
-                    course.skill
-                    ||
-
-                    "Completed Course";
-
-            }
-
-            else {
-
-                name =
-                    "Completed Course";
-
-            }
-
-
-            item.textContent =
-                `✓ ${name}`;
-
-
-            list.appendChild(
-                item
+                    return (
+                        course.title ||
+                        course.name ||
+                        course.course ||
+                        "Completed course"
+                    );
+                }
             );
 
-        }
 
-    );
+    if (
+        names.length === 1
+    ) {
 
+        message.textContent =
+            `You have completed ${names[0]}. Keep going with your personalized roadmap!`;
+
+    } else {
+
+        message.textContent =
+            `You have completed ${names.length} courses: ${names.join(", ")}. Keep going with your personalized roadmap!`;
+    }
 }
 
 
-/* =========================================================
-   UPDATE WHEN STORAGE CHANGES
-   ========================================================= */
+// ============================================================
+// EMPTY DASHBOARD
+// ============================================================
 
-window.addEventListener(
+function updateEmptyDashboard() {
 
-    "storage",
+    setText(
+        "progress",
+        "0%"
+    );
 
-    event => {
 
-        if (
+    setText(
+        "completed",
+        "0"
+    );
 
-            event.key ===
-                "completedCourses"
 
-            ||
+    setText(
+        "availableCourses",
+        "0"
+    );
 
-            event.key ===
-                "recommendation"
 
-            ||
+    setText(
+        "studyTime",
+        "Not set"
+    );
 
-            event.key ===
-                "learnPathProfile"
 
-        ) {
+    setText(
+        "donutPercentage",
+        "0%"
+    );
 
-            loadDashboard();
 
-        }
+    const chart =
+        document.getElementById(
+            "skillChart"
+        );
 
+
+    if (chart) {
+
+        chart.innerHTML = `
+            <p style="opacity:0.7;">
+                No recommendation data available.
+            </p>
+        `;
     }
 
-);
+
+    updateDonut(
+        0
+    );
 
 
-/* =========================================================
-   UPDATE WHEN USER RETURNS
-   ========================================================= */
+    const message =
+        document.getElementById(
+            "completedMessage"
+        );
 
-window.addEventListener(
 
-    "focus",
+    if (message) {
 
-    () => {
-
-        loadDashboard();
-
+        message.textContent =
+            "No completed courses yet. Start your roadmap to see progress here.";
     }
+}
 
-);
+
+// ============================================================
+// DEFAULT DASHBOARD
+// ============================================================
+
+function showDefaultDashboard() {
+
+    console.warn(
+        "No selected learning profile found."
+    );
+
+
+    setText(
+        "topNavName",
+        "Student"
+    );
+
+
+    setText(
+        "welcomeMessage",
+        "Welcome back! 👋"
+    );
+
+
+    updateEmptyDashboard();
+}
+
+
+// ============================================================
+// SET TEXT
+// ============================================================
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (element) {
+
+        element.textContent =
+            value;
+    }
+}
+
+
+// ============================================================
+// CLAMP
+// ============================================================
+
+function clamp(
+    value,
+    min,
+    max
+) {
+
+    return Math.min(
+        max,
+        Math.max(
+            min,
+            value
+        )
+    );
+}
