@@ -10,6 +10,26 @@ import joblib
 MODEL_PATH = "model.pkl"
 COURSES_PATH = "dataset/courses.csv"
 
+# =========================================================
+# RECOMMENDATION POLICY
+# =========================================================
+# The roadmap can contain UP TO 10 courses, but 10 is not
+# mandatory. Courses must be meaningfully related to the
+# learner's career/learning goal.
+MAX_RECOMMENDATIONS = 10
+
+# A course is considered directly relevant when its primary
+# skill has at least this much importance for the goal.
+MIN_DIRECT_GOAL_RELEVANCE = 0.40
+
+# A lower-level course may still be included when it is a
+# prerequisite for an important goal skill.
+MIN_FUTURE_GOAL_RELEVANCE = 0.70
+
+# Do not fill the roadmap with weak recommendations just to
+# reach 10 courses. Recommendation score is out of 100.
+MIN_RECOMMENDATION_SCORE = 50.0
+
 
 # =========================================================
 # LOAD MODEL
@@ -1514,6 +1534,42 @@ def build_candidates(
         )
 
 
+        # -------------------------------------------------
+        # GOAL-RELEVANCE FILTER
+        # -------------------------------------------------
+        # This is the important change. Previously every
+        # course that passed prerequisites could become a
+        # recommendation, even when its skill was weakly
+        # related to the selected career.
+        #
+        # Keep a course only when either:
+        #   1. its own skill is important for the goal, OR
+        #   2. it is a meaningful prerequisite for an important
+        #      future skill.
+        direct_relevance = metrics[
+            "goal_relevance"
+        ] / 100.0
+
+        future_relevance_score = future_relevance(
+            course_id,
+            goal_weights
+        )
+
+        if (
+            direct_relevance < MIN_DIRECT_GOAL_RELEVANCE
+            and future_relevance_score < MIN_FUTURE_GOAL_RELEVANCE
+        ):
+            continue
+
+        # Do not use unrelated courses merely to reach the
+        # maximum of 10 roadmap steps.
+        if (
+            metrics["recommendation_score"]
+            < MIN_RECOMMENDATION_SCORE
+        ):
+            continue
+
+
         candidates.append({
 
             "course_id":
@@ -1713,7 +1769,7 @@ def calculate_mastery_gain(
 def recommend_courses(
     user,
     completed_courses,
-    number_of_recommendations=10
+    number_of_recommendations=MAX_RECOMMENDATIONS
 ):
 
     if courses.empty:
@@ -1813,8 +1869,17 @@ def recommend_courses(
     # BUILD ROADMAP
     # =====================================================
 
+    # Never return more than the configured maximum, even if
+    # a caller requests a larger number. The loop can still
+    # finish early when there are no sufficiently relevant
+    # courses left.
+    recommendation_limit = min(
+        max(0, int(number_of_recommendations or 0)),
+        MAX_RECOMMENDATIONS
+    )
+
     for step in range(
-        number_of_recommendations
+        recommendation_limit
     ):
 
         # -------------------------------------------------
@@ -1900,6 +1965,18 @@ def recommend_courses(
         if selected is None:
 
             selected = candidates[0]
+
+
+        # -------------------------------------------------
+        # QUALITY STOP
+        # -------------------------------------------------
+        # If the best remaining course is already weak, stop
+        # instead of padding the roadmap with low-value items.
+        if (
+            selected["recommendation_score"]
+            < MIN_RECOMMENDATION_SCORE
+        ):
+            break
 
 
         # -------------------------------------------------
@@ -2087,5 +2164,5 @@ def recommend_courses(
 
 
     return roadmap[
-        :number_of_recommendations
+        :recommendation_limit
     ]

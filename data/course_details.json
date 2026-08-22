@@ -1,0 +1,781 @@
+{
+  "Python Basics": {
+    "topics": [
+      "Python syntax and variables",
+      "Data types and operators",
+      "Conditional statements",
+      "Loops",
+      "Functions",
+      "Lists, tuples, sets and dictionaries",
+      "File handling",
+      "Exception handling"
+    ],
+    "youtube": [
+      {
+        "title": "Python for Beginners",
+        "url": "https://www.youtube.com/results?search_query=python+for+beginners"
+      },
+      {
+        "title": "Python Full Course",
+        "url": "https://www.youtube.com/results?search_query=python+full+course"
+      }
+    ],
+    "practice": [
+      "Write a program to check whether a number is prime.",
+      "Create a program that counts vowels in a string.",
+      "Build a simple calculator using functions.",
+      "Create a student marks dictionary and calculate the average."
+    ],
+    "assessment": [
+      {
+        "question": "Which data type stores key-value pairs in Python?",
+        "options": ["List", "Tuple", "Dictionary", "Set"],
+        "answer": 2
+      },
+      {
+        "question": "Which keyword is used to define a function?",
+        "options": ["function", "def", "func", "define"],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Advanced Python": {
+    "topics": [
+      "Object-oriented programming",
+      "Classes and objects",
+      "Inheritance",
+      "Polymorphism",
+      "Decorators",
+      "Lambda functions",
+      "Generators",
+      "Iterators",
+      "Modules and packages"
+    ],
+    "youtube": [
+      {
+        "title": "Advanced Python Programming",
+        "url": "https://www.youtube.com/results?search_query=advanced+python+programming"
+      },
+      {
+        "title": "Python OOP",
+        "url": "https://www.youtube.com/results?search_query=python+oop"
+      }
+    ],
+    "practice": [
+      "Create a Student class with methods for marks and grades.",
+      "Implement inheritance using Employee and Manager classes.",
+      "Create a custom iterator.",
+      "Write a decorator that measures execution time."
+    ],
+    "assessment": [
+      {
+        "question": "What is inheritance used for?",
+        "options": [
+          "Creating loops",
+          "Reusing and extending class behavior",
+          "Reading files",
+          "Sorting lists"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Statistics for Data Science": {
+    "topics": [
+      "Mean, median and mode",
+      "Variance and standard deviation",
+      "Probability fundamentals",
+      "Probability distributions",
+      "Normal distribution",
+      "Correlation",
+      "Regression fundamentals",
+      "Hypothesis testing",
+      "Confidence intervals"
+    ],
+    "youtube": [
+      {
+        "title": "Statistics for Data Science",
+        "url": "https://www.youtube.com/results?search_query=statistics+for+data+science"
+      }
+    ],
+    "practice": [
+      "Calculate mean, median and standard deviation for a dataset.",
+      "Calculate Pearson correlation between two variables.",
+      "Solve a normal distribution probability problem.",
+      "Perform a basic hypothesis test."
+    ],
+    "assessment": [
+      {
+        "question": "Which measure represents the spread of data?",
+        "options": [
+          "Mean",
+          "Median",
+          "Standard deviation",
+          "Mode"
+        ],
+        "answer": 2
+      }
+    ]
+  },
+
+  "NumPy": {
+    "topics": [
+      "NumPy arrays",
+      "Array creation",
+      "Array indexing and slicing",
+      "Array reshaping",
+      "Vectorized operations",
+      "Broadcasting",
+      "Mathematical functions",
+      "Matrix operations"
+    ],
+    "youtube": [
+      {
+        "title": "NumPy Tutorial",
+        "url": "https://www.youtube.com/results?search_query=numpy+tutorial"
+      }
+    ],
+    "practice": [
+      "Create and reshape a NumPy matrix.",
+      "Perform matrix multiplication.",
+      "Calculate mean and standard deviation using NumPy.",
+      "Use broadcasting to perform operations on arrays."
+    ],
+    "assessment": [
+      {
+        "question": "What is the primary data structure in NumPy?",
+        "options": [
+          "DataFrame",
+          "ndarray",
+          "Dictionary",
+          "Set"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Pandas": {
+    "topics": [
+      "Series",
+      "DataFrames",
+      "Reading CSV files",
+      "Data selection",
+      "Filtering",
+      "Missing values",
+      "Grouping and aggregation",
+      "Merging datasets"
+    ],
+    "youtube": [
+      {
+        "title": "Pandas Python Tutorial",
+        "url": "https://www.youtube.com/results?search_query=pandas+python+tutorial"
+      }
+    ],
+    "practice": [
+      "Load a CSV dataset using Pandas.",
+      "Find and handle missing values.",
+      "Group data by category and calculate averages.",
+      "Merge two DataFrames."
+    ],
+    "assessment": [
+      {
+        "question": "Which Pandas structure is two-dimensional?",
+        "options": [
+          "Series",
+          "DataFrame",
+          "Array",
+          "Tuple"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Data Visualization": {
+    "topics": [
+      "Data visualization principles",
+      "Matplotlib",
+      "Line charts",
+      "Bar charts",
+      "Scatter plots",
+      "Histograms",
+      "Seaborn",
+      "Choosing appropriate charts"
+    ],
+    "youtube": [
+      {
+        "title": "Python Data Visualization",
+        "url": "https://www.youtube.com/results?search_query=python+data+visualization+matplotlib+seaborn"
+      }
+    ],
+    "practice": [
+      "Create a line chart from a dataset.",
+      "Create a histogram of numerical data.",
+      "Build a scatter plot showing two correlated variables.",
+      "Create a dashboard-style visualization."
+    ],
+    "assessment": [
+      {
+        "question": "Which chart is suitable for showing the relationship between two numerical variables?",
+        "options": [
+          "Pie chart",
+          "Scatter plot",
+          "Bar chart",
+          "Histogram"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Machine Learning Basics": {
+    "topics": [
+      "Introduction to machine learning",
+      "Supervised learning",
+      "Unsupervised learning",
+      "Training and testing data",
+      "Features and labels",
+      "Model evaluation",
+      "Overfitting and underfitting",
+      "Cross-validation"
+    ],
+    "youtube": [
+      {
+        "title": "Machine Learning for Beginners",
+        "url": "https://www.youtube.com/results?search_query=machine+learning+for+beginners"
+      },
+      {
+        "title": "Machine Learning Fundamentals",
+        "url": "https://www.youtube.com/results?search_query=machine+learning+fundamentals"
+      }
+    ],
+    "practice": [
+      "Split a dataset into training and testing sets.",
+      "Train a basic machine learning model using Scikit-learn.",
+      "Compare training and testing accuracy.",
+      "Identify an example of overfitting."
+    ],
+    "assessment": [
+      {
+        "question": "What is the purpose of a test dataset?",
+        "options": [
+          "Train the model",
+          "Evaluate model performance on unseen data",
+          "Store features",
+          "Remove missing values"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Regression": {
+    "topics": [
+      "Linear regression",
+      "Multiple linear regression",
+      "Regression features",
+      "Cost function",
+      "Gradient descent",
+      "Model evaluation",
+      "Mean squared error",
+      "R-squared"
+    ],
+    "youtube": [
+      {
+        "title": "Linear Regression Explained",
+        "url": "https://www.youtube.com/results?search_query=linear+regression+machine+learning"
+      }
+    ],
+    "practice": [
+      "Build a linear regression model.",
+      "Predict house prices using regression.",
+      "Calculate MSE and R-squared.",
+      "Compare actual and predicted values."
+    ],
+    "assessment": [
+      {
+        "question": "Which metric measures the average squared prediction error?",
+        "options": [
+          "Accuracy",
+          "MSE",
+          "Precision",
+          "Recall"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Classification": {
+    "topics": [
+      "Classification fundamentals",
+      "Logistic regression",
+      "Decision trees",
+      "K-nearest neighbors",
+      "Support vector machines",
+      "Confusion matrix",
+      "Precision and recall",
+      "F1 score"
+    ],
+    "youtube": [
+      {
+        "title": "Classification Machine Learning",
+        "url": "https://www.youtube.com/results?search_query=classification+machine+learning"
+      }
+    ],
+    "practice": [
+      "Build a binary classification model.",
+      "Generate a confusion matrix.",
+      "Calculate precision, recall and F1 score.",
+      "Compare two classification algorithms."
+    ],
+    "assessment": [
+      {
+        "question": "Which metric is especially useful when false negatives are important?",
+        "options": [
+          "Recall",
+          "MSE",
+          "R-squared",
+          "MAE"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "Clustering": {
+    "topics": [
+      "Unsupervised learning",
+      "K-means clustering",
+      "Centroids",
+      "Distance measures",
+      "Choosing the number of clusters",
+      "Elbow method",
+      "Hierarchical clustering",
+      "Cluster evaluation"
+    ],
+    "youtube": [
+      {
+        "title": "K-Means Clustering",
+        "url": "https://www.youtube.com/results?search_query=k+means+clustering"
+      }
+    ],
+    "practice": [
+      "Apply K-means to a customer dataset.",
+      "Use the elbow method to select K.",
+      "Visualize clusters.",
+      "Compare different cluster counts."
+    ],
+    "assessment": [
+      {
+        "question": "K-means clustering is an example of which type of learning?",
+        "options": [
+          "Supervised",
+          "Unsupervised",
+          "Reinforcement",
+          "Transfer"
+        ],
+        "answer": 1
+      }
+    ]
+  },
+
+  "Deep Learning Basics": {
+    "topics": [
+      "Introduction to deep learning",
+      "Artificial neurons",
+      "Neural network architecture",
+      "Input, hidden and output layers",
+      "Activation functions",
+      "Forward propagation",
+      "Loss functions",
+      "Backpropagation",
+      "Gradient descent",
+      "Optimizers"
+    ],
+    "youtube": [
+      {
+        "title": "Deep Learning Fundamentals",
+        "url": "https://www.youtube.com/results?search_query=deep+learning+fundamentals"
+      },
+      {
+        "title": "Neural Networks Explained",
+        "url": "https://www.youtube.com/results?search_query=neural+networks+explained"
+      },
+      {
+        "title": "Backpropagation Explained",
+        "url": "https://www.youtube.com/results?search_query=backpropagation+explained"
+      }
+    ],
+    "practice": [
+      "Implement a single artificial neuron.",
+      "Build a simple neural network using a deep learning framework.",
+      "Compare ReLU, Sigmoid and Tanh activation functions.",
+      "Train a neural network on a small classification dataset.",
+      "Experiment with different learning rates."
+    ],
+    "assessment": [
+      {
+        "question": "What is the primary purpose of an activation function?",
+        "options": [
+          "Store datasets",
+          "Introduce non-linearity into a neural network",
+          "Delete neurons",
+          "Increase dataset size"
+        ],
+        "answer": 1
+      },
+      {
+        "question": "What happens during backpropagation?",
+        "options": [
+          "Weights are adjusted using calculated gradients",
+          "Data is deleted",
+          "Classes are renamed",
+          "The dataset is duplicated"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "CNN": {
+    "topics": [
+      "Convolutional neural networks",
+      "Images as tensors",
+      "Convolution operation",
+      "Filters and kernels",
+      "Pooling",
+      "Feature maps",
+      "CNN architecture",
+      "Image classification"
+    ],
+    "youtube": [
+      {
+        "title": "CNN Explained",
+        "url": "https://www.youtube.com/results?search_query=convolutional+neural+network+explained"
+      }
+    ],
+    "practice": [
+      "Build a CNN for image classification.",
+      "Experiment with different convolution filters.",
+      "Compare max pooling and average pooling.",
+      "Train a CNN on MNIST or CIFAR-10."
+    ],
+    "assessment": [
+      {
+        "question": "What does a convolution filter learn?",
+        "options": [
+          "Image features",
+          "File names",
+          "Database rows",
+          "Text paragraphs"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "RNN": {
+    "topics": [
+      "Sequential data",
+      "Recurrent neural networks",
+      "Hidden states",
+      "Sequence processing",
+      "Vanishing gradients",
+      "RNN training",
+      "Sequence prediction"
+    ],
+    "youtube": [
+      {
+        "title": "RNN Explained",
+        "url": "https://www.youtube.com/results?search_query=recurrent+neural+network+RNN+explained"
+      }
+    ],
+    "practice": [
+      "Build an RNN for sequence prediction.",
+      "Train an RNN on a text dataset.",
+      "Observe the effect of sequence length.",
+      "Compare an RNN with a feed-forward network."
+    ],
+    "assessment": [
+      {
+        "question": "RNNs are particularly useful for what type of data?",
+        "options": [
+          "Sequential data",
+          "Only images",
+          "Only spreadsheets",
+          "Static HTML"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "LSTM": {
+    "topics": [
+      "LSTM architecture",
+      "Cell state",
+      "Forget gate",
+      "Input gate",
+      "Output gate",
+      "Long-term dependencies",
+      "LSTM training"
+    ],
+    "youtube": [
+      {
+        "title": "LSTM Explained",
+        "url": "https://www.youtube.com/results?search_query=LSTM+explained"
+      }
+    ],
+    "practice": [
+      "Build an LSTM for text classification.",
+      "Implement time-series prediction using LSTM.",
+      "Experiment with sequence length.",
+      "Compare LSTM and standard RNN performance."
+    ],
+    "assessment": [
+      {
+        "question": "Which component helps an LSTM control what information is discarded?",
+        "options": [
+          "Forget gate",
+          "Pooling layer",
+          "Kernel",
+          "Output dataset"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "NLP Basics": {
+    "topics": [
+      "Natural language processing",
+      "Text preprocessing",
+      "Tokenization",
+      "Stop words",
+      "Stemming",
+      "Lemmatization",
+      "Bag of words",
+      "TF-IDF",
+      "Text classification"
+    ],
+    "youtube": [
+      {
+        "title": "NLP for Beginners",
+        "url": "https://www.youtube.com/results?search_query=NLP+for+beginners"
+      }
+    ],
+    "practice": [
+      "Tokenize a text dataset.",
+      "Remove stop words.",
+      "Build a TF-IDF representation.",
+      "Create a basic sentiment classifier."
+    ],
+    "assessment": [
+      {
+        "question": "What is tokenization?",
+        "options": [
+          "Converting text into smaller units",
+          "Deleting a dataset",
+          "Training an image model",
+          "Compressing images"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "Attention Mechanism": {
+    "topics": [
+      "Attention mechanism",
+      "Queries, keys and values",
+      "Attention scores",
+      "Scaled dot-product attention",
+      "Self-attention",
+      "Multi-head attention"
+    ],
+    "youtube": [
+      {
+        "title": "Attention Mechanism Explained",
+        "url": "https://www.youtube.com/results?search_query=attention+mechanism+transformers"
+      }
+    ],
+    "practice": [
+      "Calculate simple attention scores.",
+      "Implement scaled dot-product attention.",
+      "Visualize attention weights.",
+      "Explain the role of queries, keys and values."
+    ],
+    "assessment": [
+      {
+        "question": "What does self-attention allow a model to do?",
+        "options": [
+          "Relate different positions within a sequence",
+          "Delete tokens",
+          "Only process images",
+          "Increase storage"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "Transformers": {
+    "topics": [
+      "Transformer architecture",
+      "Self-attention",
+      "Multi-head attention",
+      "Positional encoding",
+      "Encoder and decoder",
+      "Feed-forward layers",
+      "Transformer training"
+    ],
+    "youtube": [
+      {
+        "title": "Transformers Explained",
+        "url": "https://www.youtube.com/results?search_query=transformers+architecture+explained"
+      },
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://www.youtube.com/results?search_query=attention+is+all+you+need+transformers"
+      }
+    ],
+    "practice": [
+      "Implement a simplified self-attention mechanism.",
+      "Visualize positional encodings.",
+      "Build a small transformer model.",
+      "Compare transformer and RNN architectures."
+    ],
+    "assessment": [
+      {
+        "question": "Which mechanism is central to Transformer architectures?",
+        "options": [
+          "Self-attention",
+          "K-means",
+          "Decision trees",
+          "Pooling only"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "GPT": {
+    "topics": [
+      "Generative language models",
+      "Transformer decoder architecture",
+      "Autoregressive generation",
+      "Tokenization",
+      "Pretraining",
+      "Fine-tuning",
+      "Prompting",
+      "Text generation"
+    ],
+    "youtube": [
+      {
+        "title": "GPT Explained",
+        "url": "https://www.youtube.com/results?search_query=GPT+explained"
+      },
+      {
+        "title": "Large Language Models Explained",
+        "url": "https://www.youtube.com/results?search_query=large+language+models+explained"
+      }
+    ],
+    "practice": [
+      "Build a simple text generation pipeline.",
+      "Experiment with temperature during generation.",
+      "Compare different prompts.",
+      "Use a pretrained language model for text generation."
+    ],
+    "assessment": [
+      {
+        "question": "GPT-style models primarily generate text using which approach?",
+        "options": [
+          "Autoregressive prediction",
+          "K-means clustering",
+          "Image convolution",
+          "Decision tree traversal"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "Hugging Face": {
+    "topics": [
+      "Hugging Face ecosystem",
+      "Transformers library",
+      "Pretrained models",
+      "Tokenizers",
+      "Pipelines",
+      "Datasets",
+      "Fine-tuning",
+      "Model inference"
+    ],
+    "youtube": [
+      {
+        "title": "Hugging Face Transformers Tutorial",
+        "url": "https://www.youtube.com/results?search_query=Hugging+Face+Transformers+tutorial"
+      }
+    ],
+    "practice": [
+      "Load a pretrained model using Transformers.",
+      "Run sentiment analysis with a pipeline.",
+      "Tokenize text using a pretrained tokenizer.",
+      "Fine-tune a small model on a sample dataset."
+    ],
+    "assessment": [
+      {
+        "question": "What is the Hugging Face Transformers library commonly used for?",
+        "options": [
+          "Working with pretrained transformer models",
+          "Creating databases only",
+          "Operating systems",
+          "Network routing"
+        ],
+        "answer": 0
+      }
+    ]
+  },
+
+  "AI Project": {
+    "topics": [
+      "Problem definition",
+      "Dataset collection",
+      "Data preprocessing",
+      "Model selection",
+      "Model training",
+      "Evaluation",
+      "Deployment",
+      "Documentation"
+    ],
+    "youtube": [
+      {
+        "title": "End-to-End AI Project",
+        "url": "https://www.youtube.com/results?search_query=end+to+end+AI+project"
+      }
+    ],
+    "practice": [
+      "Choose a real-world AI problem.",
+      "Collect and clean a dataset.",
+      "Train and evaluate an appropriate model.",
+      "Create a simple application around the model.",
+      "Document the complete project."
+    ],
+    "assessment": [
+      {
+        "question": "What should be defined first in an AI project?",
+        "options": [
+          "Problem statement",
+          "UI color",
+          "Database password",
+          "Deployment server"
+        ],
+        "answer": 0
+      }
+    ]
+  }
+}

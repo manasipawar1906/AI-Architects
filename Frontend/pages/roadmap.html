@@ -24,12 +24,113 @@
         href="../css/roadmap.css"
     >
 
+    <!-- =====================================================
+         ROADMAP SUMMARY CARD COLORS
+         Only the first four roadmap boxes are changed.
+         No layout or functionality is changed.
+         ===================================================== -->
+
+    <style>
+
+        /* =====================================================
+           FIRST BOX
+           Goal Readiness
+           Same pink → purple style as Dashboard
+           ===================================================== */
+
+        .summary-grid .summary-card:nth-child(1) {
+            background: linear-gradient(
+                135deg,
+                #ff5f6d 0%,
+                #c471ed 100%
+            ) !important;
+
+            border: none !important;
+            color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           SECOND BOX
+           Skills You Have
+           Blue → Indigo
+           ===================================================== */
+
+        .summary-grid .summary-card:nth-child(2) {
+            background: linear-gradient(
+                135deg,
+                #4361ee 0%,
+                #3a0ca3 100%
+            ) !important;
+
+            border: none !important;
+            color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           THIRD BOX
+           Skills To Learn
+           Teal → Blue
+           ===================================================== */
+
+        .summary-grid .summary-card:nth-child(3) {
+            background: linear-gradient(
+                135deg,
+                #2ec4b6 0%,
+                #118ab2 100%
+            ) !important;
+
+            border: none !important;
+            color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           FOURTH BOX
+           Recommended Steps
+           Purple → Deep Purple
+           ===================================================== */
+
+        .summary-grid .summary-card:nth-child(4) {
+            background: linear-gradient(
+                135deg,
+                #7209b7 0%,
+                #3a0ca3 100%
+            ) !important;
+
+            border: none !important;
+            color: #ffffff !important;
+        }
+
+
+        /* =====================================================
+           KEEP TEXT WHITE INSIDE ALL FOUR COLORED BOXES
+           ===================================================== */
+
+        .summary-grid .summary-card:nth-child(1) p,
+        .summary-grid .summary-card:nth-child(1) strong,
+
+        .summary-grid .summary-card:nth-child(2) p,
+        .summary-grid .summary-card:nth-child(2) strong,
+
+        .summary-grid .summary-card:nth-child(3) p,
+        .summary-grid .summary-card:nth-child(3) strong,
+
+        .summary-grid .summary-card:nth-child(4) p,
+        .summary-grid .summary-card:nth-child(4) strong {
+            color: #ffffff !important;
+        }
+
+    </style>
+
 </head>
 
 
 <body>
 
 <div class="app-container">
+
 
     <!-- =====================================================
          SIDEBAR
@@ -78,7 +179,9 @@
     <main class="main-content">
 
 
-        <!-- TOP BAR -->
+        <!-- =====================================================
+             TOP BAR
+             ===================================================== -->
 
         <header
             class="top-bar"
@@ -93,7 +196,6 @@
                         Student
                     </strong>
 
-
                     <span>
                         Student
                     </span>
@@ -105,9 +207,9 @@
         </header>
 
 
-        <!-- =================================================
+        <!-- =====================================================
              ROADMAP HEADER
-             ================================================= -->
+             ===================================================== -->
 
         <div class="roadmap-header">
 
@@ -129,13 +231,18 @@
         </div>
 
 
-        <!-- =================================================
-             SUMMARY
-             ================================================= -->
+        <!-- =====================================================
+             SUMMARY CARDS
+             ===================================================== -->
 
         <section
             class="summary-grid"
         >
+
+
+            <!-- =================================================
+                 1. GOAL READINESS
+                 ================================================= -->
 
             <div class="summary-card">
 
@@ -153,6 +260,10 @@
             </div>
 
 
+            <!-- =================================================
+                 2. SKILLS YOU HAVE
+                 ================================================= -->
+
             <div class="summary-card">
 
                 <p>
@@ -169,6 +280,10 @@
             </div>
 
 
+            <!-- =================================================
+                 3. SKILLS TO LEARN
+                 ================================================= -->
+
             <div class="summary-card">
 
                 <p>
@@ -184,6 +299,10 @@
 
             </div>
 
+
+            <!-- =================================================
+                 4. RECOMMENDED STEPS
+                 ================================================= -->
 
             <div class="summary-card">
 
@@ -203,9 +322,9 @@
         </section>
 
 
-        <!-- =================================================
+        <!-- =====================================================
              SKILL MAP
-             ================================================= -->
+             ===================================================== -->
 
         <section
             class="skill-gap"
@@ -224,18 +343,18 @@
         </section>
 
 
-        <!-- =================================================
+        <!-- =====================================================
              ROADMAP
-             ================================================= -->
+             ===================================================== -->
 
         <section
             id="roadmapContainer"
         ></section>
 
 
-        <!-- =================================================
+        <!-- =====================================================
              TOP AI RECOMMENDATIONS
-             ================================================= -->
+             ===================================================== -->
 
         <section
             class="recommendations"
